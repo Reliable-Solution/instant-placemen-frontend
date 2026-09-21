@@ -1,0 +1,455 @@
+"use client";
+
+import React, { useState } from "react";
+import {
+  X,
+  Phone,
+  Mail,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Calendar,
+  Clock,
+  Download,
+  ExternalLink,
+  BadgeCheck,
+  CheckCircle2,
+  Building2,
+  FileText,
+  DollarSign,
+  MessageSquare,
+  ShieldCheck,
+  User,
+  Sparkles,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+interface CandidateDetailModalProps {
+  candidate: any;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
+  candidate,
+  isOpen,
+  onClose,
+}) => {
+  const [activeTab, setActiveTab] = useState<"profile" | "cv">("profile");
+
+  if (!isOpen || !candidate) return null;
+
+  const cleanPhone = String(candidate.phone || "").replace(/\D/g, "").slice(-10);
+  const whatsappNumber = String(candidate.whatsappNumber || candidate.phone || "").replace(/\D/g, "").slice(-10);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+  const SERVER_BASE = API_BASE.replace("/api/v1", "");
+
+  const hasResume = Boolean(candidate.resumeUrl);
+  const resumeUrl = candidate.resumeUrl?.startsWith("http")
+    ? candidate.resumeUrl
+    : `${SERVER_BASE}${candidate.resumeUrl}`;
+  
+  const resumeDisplayName = candidate.resumeFile || candidate.resumeUrl?.split("/").pop() || "Resume.pdf";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+        {/* ─── Modal Sticky Header ─── */}
+        <div className="p-5 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white flex items-start justify-between gap-4 shrink-0">
+          <div className="flex items-start gap-4">
+            {/* Avatar / Profile Image */}
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-400 text-white font-black text-2xl flex items-center justify-center shadow-lg border-2 border-white/20 overflow-hidden">
+                {candidate.avatar ? (
+                  <img
+                    src={candidate.avatar}
+                    alt={candidate.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{candidate.name ? candidate.name.charAt(0).toUpperCase() : "C"}</span>
+                )}
+              </div>
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full" title="Active Candidate" />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-extrabold text-white flex items-center gap-1.5">
+                  <span>{candidate.name || "Candidate Profile"}</span>
+                  <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" />
+                </h2>
+                {candidate.isImmediateJoiner !== false && (
+                  <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold rounded-full">
+                    Immediate Joiner
+                  </span>
+                )}
+                {candidate.consentToShareProfile && (
+                  <span className="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold rounded-full flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Consent Verified
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs text-blue-200 font-semibold flex items-center gap-2 flex-wrap">
+                <span className="text-white font-bold">{candidate.currentRole || "Candidate"}</span>
+                {candidate.currentCompany && (
+                  <>
+                    <span>•</span>
+                    <span className="text-blue-300">🏢 {candidate.currentCompany}</span>
+                  </>
+                )}
+                <span>•</span>
+                <span>📍 {candidate.locality ? `${candidate.locality}, ` : ""}{candidate.city || "Surat"}</span>
+              </p>
+
+              {/* Direct Quick Actions */}
+              <div className="flex items-center gap-2 pt-2 flex-wrap">
+                <a
+                  href={`tel:+91${cleanPhone}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Call +91 {cleanPhone}</span>
+                </a>
+
+                <a
+                  href={`https://wa.me/91${whatsappNumber}?text=Hello%20${encodeURIComponent(candidate.name || "")},%20we%20reviewed%20your%20profile%20on%20Instant%20Placement.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition-colors"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>WhatsApp</span>
+                </a>
+
+                {candidate.email && (
+                  <a
+                    href={`mailto:${candidate.email}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Email</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shrink-0"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* ─── Tabs Switcher ─── */}
+        <div className="flex border-b border-slate-200 bg-slate-50 px-6 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab("profile")}
+            className={`py-3 px-4 font-bold text-xs border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === "profile"
+                ? "border-blue-600 text-blue-600 bg-white"
+                : "border-transparent text-slate-500 hover:text-slate-900"
+            }`}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Complete Profile Details</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("cv")}
+            className={`py-3 px-4 font-bold text-xs border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === "cv"
+                ? "border-blue-600 text-blue-600 bg-white"
+                : "border-transparent text-slate-500 hover:text-slate-900"
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Original CV Document</span>
+            {hasResume && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 ml-1" />
+            )}
+          </button>
+        </div>
+
+        {/* ─── Modal Scrollable Body ─── */}
+        <div className="overflow-y-auto p-6 space-y-6">
+          {activeTab === "profile" ? (
+            <>
+              {/* Profile Summary Card */}
+              {candidate.resumeSummary && (
+                <div className="bg-gradient-to-r from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-2xl p-5 shadow-xs">
+                  <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Profile Summary &amp; Professional Bio</span>
+                  </h3>
+                  <p className="text-xs text-slate-700 leading-relaxed italic">
+                    "{candidate.resumeSummary}"
+                  </p>
+                </div>
+              )}
+
+              {/* Information Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Contact: Phone */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Mobile Number
+                  </span>
+                  <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-emerald-600" />
+                    <span>+91 {candidate.phone}</span>
+                  </div>
+                </div>
+
+                {/* Contact: WhatsApp */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    WhatsApp Number
+                  </span>
+                  <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-emerald-600" />
+                    <span>+91 {candidate.whatsappNumber || candidate.phone}</span>
+                  </div>
+                </div>
+
+                {/* Contact: Email */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Email Address
+                  </span>
+                  <div className="font-bold text-xs text-slate-900 truncate flex items-center gap-2" title={candidate.email}>
+                    <Mail className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span className="truncate">{candidate.email || "Not provided"}</span>
+                  </div>
+                </div>
+
+                {/* Target Role */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Target Role / Designation
+                  </span>
+                  <div className="font-extrabold text-sm text-blue-700 flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-blue-600" />
+                    <span>{candidate.currentRole || "Open to Opportunities"}</span>
+                  </div>
+                </div>
+
+                {/* Current Company */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Current / Recent Company
+                  </span>
+                  <div className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-slate-500" />
+                    <span>{candidate.currentCompany || "N/A (Fresher or Not Disclosed)"}</span>
+                  </div>
+                </div>
+
+                {/* Experience Tier */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Experience Level
+                  </span>
+                  <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-purple-600" />
+                    <span>
+                      {candidate.experience || "Fresher"}
+                      {candidate.totalExperienceYears ? ` (${candidate.totalExperienceYears} Yrs)` : ""}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Highest Qualification
+                  </span>
+                  <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-amber-600" />
+                    <span>{candidate.highestQualification || candidate.qualification || "12th Pass"}</span>
+                  </div>
+                </div>
+
+                {/* City & Locality */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    City &amp; Area / Locality
+                  </span>
+                  <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-rose-600" />
+                    <span>{candidate.locality ? `${candidate.locality}, ` : ""}{candidate.city || "Surat"}</span>
+                  </div>
+                </div>
+
+                {/* Expected Salary */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Expected Monthly Salary
+                  </span>
+                  <div className="font-extrabold text-sm text-emerald-700 flex items-center gap-1.5">
+                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                    <span>
+                      {candidate.expectedSalaryMonthly || candidate.expectedSalary
+                        ? `₹${Number(candidate.expectedSalaryMonthly || candidate.expectedSalary).toLocaleString("en-IN")} / mo`
+                        : "As per company standard"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Notice Period */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Notice Period
+                  </span>
+                  <span className="font-bold text-sm text-slate-800">
+                    {candidate.noticePeriod === "IMMEDIATE" ? "Immediate Joiner" : candidate.noticePeriod || "Immediate"}
+                  </span>
+                </div>
+
+                {/* Willing to Relocate */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Relocation Willingness
+                  </span>
+                  <span className="font-bold text-sm text-slate-800">
+                    {candidate.willingToRelocate ? "Yes, open to relocate" : "No, local commute only"}
+                  </span>
+                </div>
+
+                {/* Registration Date */}
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Member Since
+                  </span>
+                  <span className="font-bold text-sm text-slate-800">
+                    {candidate.createdAt ? new Date(candidate.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Recently Joined"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Detailed Qualification Note if present */}
+              {candidate.qualificationDetail && (
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                    Academic Background &amp; Degree Information
+                  </span>
+                  <p className="text-xs font-semibold text-slate-800">
+                    {candidate.qualificationDetail}
+                  </p>
+                </div>
+              )}
+
+              {/* Skills Badges */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                    <span>Skills &amp; Competencies ({candidate.skills?.length || 0})</span>
+                  </h3>
+                </div>
+
+                {candidate.skills && candidate.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {candidate.skills.map((s: string, idx: number) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1.5 bg-blue-50/90 text-blue-800 border border-blue-200 rounded-xl text-xs font-bold shadow-2xs"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400">No skills added yet.</p>
+                )}
+              </div>
+            </>
+          ) : (
+            /* ─── CV Document Tab ─── */
+            <div className="space-y-4">
+              {hasResume ? (
+                <div className="space-y-4">
+                  {/* Action Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 truncate max-w-sm">
+                          {resumeDisplayName}
+                        </p>
+                        <p className="text-[10px] text-slate-500">Candidate Original Resume File</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold shadow-xs transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Open in New Window</span>
+                      </a>
+
+                      <a
+                        href={resumeUrl}
+                        download={resumeDisplayName}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download CV</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Embedded PDF Viewer */}
+                  <div className="w-full bg-slate-100 rounded-2xl p-2 border border-slate-200">
+                    <iframe
+                      src={`${resumeUrl}#navpanes=0&pagemode=none&view=FitH`}
+                      className="w-full h-[600px] rounded-xl border-0 bg-white"
+                      title="Candidate CV Document"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="p-12 text-center space-y-3 bg-slate-50 rounded-2xl border border-slate-200">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-200/70 text-slate-400 flex items-center justify-center mx-auto">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-800">No CV Attached</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    This candidate has not uploaded a resume file yet. You can contact them directly at +91 {candidate.phone} to request their CV.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ─── Modal Footer ─── */}
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
+            <span>Instant Placement Verified Candidate Profile</span>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all"
+          >
+            Close Profile
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

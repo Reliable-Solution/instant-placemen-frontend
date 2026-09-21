@@ -1,0 +1,56 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+import { ClientProviders } from "@/components/ClientProviders";
+
+export const metadata: Metadata = {
+  title: "Instant Placement | Verified Jobs in India & Direct HR Connect",
+  description:
+    "Find verified jobs in Surat Gujarat, Mumbai, Bengaluru, Pune, and all India. Call HR directly with 0% consultancy fees. Direct hiring for Telecaller, Delivery, Back Office, Sales, and IT roles.",
+  keywords: [
+    "WorkIndia",
+    "Apna",
+    "Jobs in India",
+    "Direct HR Call",
+    "Telecaller Jobs",
+    "Delivery Partner Jobs",
+    "Back Office Jobs",
+    "Freshers Jobs",
+    "Work from Home Jobs",
+    "Instant Placement",
+  ],
+  openGraph: {
+    title: "Instant Placement | Verified Jobs in India & Direct HR Connect",
+    description:
+      "Find verified jobs in Surat Gujarat, Mumbai, Bengaluru, Pune, and all India. Call HR directly with 0% consultancy fees.",
+    siteName: "Instant Placement",
+    locale: "en_IN",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-600 selection:text-white"
+      >
+        <ClientProviders>{children}</ClientProviders>
+      </body>
+    </html>
+  );
+}
