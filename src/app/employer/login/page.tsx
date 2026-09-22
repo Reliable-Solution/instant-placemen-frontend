@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
@@ -26,9 +26,8 @@ import {
 } from "lucide-react";
 
 import { toast } from "@/components/ui/toast";
-import { useSearchParams } from "next/navigation";
 
-export default function EmployerLoginPage() {
+function EmployerLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/employer";
@@ -269,5 +268,22 @@ export default function EmployerLoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function EmployerLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-xs text-slate-500 font-medium">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <EmployerLoginContent />
+    </Suspense>
   );
 }
