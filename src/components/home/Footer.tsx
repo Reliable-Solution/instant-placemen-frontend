@@ -39,11 +39,11 @@ export const Footer: React.FC<FooterProps> = ({
         }`}>
           {/* Brand Info */}
           <div className="space-y-3">
-            <a href="/" className="inline-block bg-white px-2.5 py-1 rounded-md shadow-xs hover:opacity-95 transition-all">
+            <a href="/" className="inline-block bg-white px-4 py-2 rounded-xl shadow-sm hover:opacity-95 transition-all">
               <img
                 src="/logo.png"
                 alt="Instant Placement"
-                className="h-5 w-auto max-w-[155px] object-contain"
+                className="h-10 sm:h-12 w-auto max-w-[220px] object-contain"
               />
             </a>
             <p className="text-slate-400 leading-relaxed text-[11px]">

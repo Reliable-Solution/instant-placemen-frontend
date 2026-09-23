@@ -24,13 +24,21 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(text || `Authentication service returned HTTP ${res.status}`);
+      }
 
       if (!res.ok || !data.success) {
         throw new Error(data.message || data.error?.message || "Invalid credentials.");
@@ -44,6 +52,10 @@ export default function AdminLoginPage() {
       }
 
       dispatch(setUser({ ...userData, token }));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ip_token", token);
+        localStorage.setItem("ip_user", JSON.stringify(userData));
+      }
       router.push("/admin");
     } catch (err: any) {
       setError(err.message || "Failed to log in.");

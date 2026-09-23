@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +20,10 @@ import {
   UserCheck,
 } from "lucide-react";
 
-export default function CandidateLoginPage() {
+function CandidateLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/candidate";
   const dispatch = useAppDispatch();
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -121,7 +123,7 @@ export default function CandidateLoginPage() {
         dispatch(setUser(data.user));
       }
 
-      router.push("/candidate");
+      router.push(redirect);
     } catch (err) {
       console.error("OTP verification error:", err);
       setErrorMessage("Could not verify OTP. Please try again.");
@@ -304,5 +306,13 @@ export default function CandidateLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CandidateLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50">Loading login...</div>}>
+      <CandidateLoginForm />
+    </Suspense>
   );
 }
