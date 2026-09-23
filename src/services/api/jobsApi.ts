@@ -199,6 +199,12 @@ export const jobsApi = baseApi.injectEndpoints({
       providesTags: ["Job"],
     }),
 
+    getJobById: builder.query<Job, string>({
+      query: (id) => `/jobs/${id}`,
+      transformResponse: (response: any) => response.job || response.data || response,
+      providesTags: (result, error, id) => [{ type: "Job", id }],
+    }),
+
     postJob: builder.mutation<{ success: boolean; message: string }, any>({
       query: (body) => ({
         url: "/jobs",
@@ -212,6 +218,7 @@ export const jobsApi = baseApi.injectEndpoints({
 
 export const {
   useGetJobsQuery,
+  useGetJobByIdQuery,
   useGetCategoriesQuery,
   useGetCitiesQuery,
   useGetServiceModulesQuery,
@@ -224,4 +231,5 @@ export const {
   useApplyForJobMutation: useApplyJobMutation,
   usePostJobMutation,
 } = jobsApi;
+
 

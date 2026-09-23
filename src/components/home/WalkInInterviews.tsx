@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Job } from "@/types";
 import { useGetWalkInJobsQuery } from "@/services/api/jobsApi";
@@ -62,10 +63,10 @@ export const WalkInInterviews: React.FC<WalkInInterviewsProps> = ({
             const waNumber = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
             return (
-              <div
+              <Link
                 key={jobId}
-                className="bg-white rounded-2xl border-2 border-slate-200/90 hover:border-rose-300 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 flex flex-col justify-between group relative overflow-hidden cursor-pointer"
-                onClick={() => onViewJob(job)}
+                href={`/job/${jobId}`}
+                className="bg-white rounded-2xl border-2 border-slate-200/90 hover:border-rose-300 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 flex flex-col justify-between group relative overflow-hidden"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -102,30 +103,13 @@ export const WalkInInterviews: React.FC<WalkInInterviewsProps> = ({
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div
-                  className="grid grid-cols-2 gap-2 pt-4 mt-2 border-t border-slate-100"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    onClick={() => onConnectHR(job, "call")}
-                    className="flex items-center justify-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-sm transition-all"
-                  >
-                    <Phone className="w-3.5 h-3.5 fill-current" /> Call HR
-                  </button>
-                  <button
-                    onClick={() => {
-                      const msg = encodeURIComponent(
-                        `Hi HR, I found your walk-in opening for ${job.title} at ${job.company} on Instant Placement. Please share the walk-in timing and address.`
-                      );
-                      window.open(`https://wa.me/${waNumber}?text=${msg}`, "_blank");
-                    }}
-                    className="flex items-center justify-center gap-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-sm transition-all"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-                  </button>
+                {/* Action CTA Button */}
+                <div className="pt-4 mt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-center gap-1 bg-rose-600 group-hover:bg-rose-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-sm transition-all">
+                    <span>View Walk-in & Apply</span>
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

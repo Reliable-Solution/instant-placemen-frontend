@@ -53,13 +53,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           : "bg-white border-b border-slate-200"
       }`}
     >
-      <div className="container mx-auto px-4 h-14 sm:h-16 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 h-18 sm:h-20 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <a href="/" className="flex items-center shrink-0">
           <img
             src="/logo.png"
             alt="Instant Placement"
-            className="h-6 sm:h-7 w-auto max-w-[155px] sm:max-w-[180px] object-contain"
+            className="h-11 sm:h-13 w-auto max-w-[220px] sm:max-w-[270px] object-contain transition-all"
           />
         </a>
 

@@ -81,7 +81,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
           <img
             src="/logo.png"
             alt="Instant Placement"
-            className="h-5.5 w-auto max-w-[130px] object-contain"
+            className="h-10 w-auto max-w-[190px] object-contain"
           />
           <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
             Candidate
@@ -113,7 +113,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                 <img
                   src="/logo.png"
                   alt="Instant Placement"
-                  className="h-5.5 w-auto max-w-[130px] object-contain"
+                  className="h-10 w-auto max-w-[190px] object-contain"
                 />
                 <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200">
                   Candidate
@@ -197,7 +197,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
               <img
                 src="/logo.png"
                 alt="Instant Placement"
-                className="h-5.5 w-auto max-w-[140px] object-contain"
+                className="h-10 w-auto max-w-[190px] object-contain"
               />
             </Link>
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">

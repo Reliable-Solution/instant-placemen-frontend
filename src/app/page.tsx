@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Job } from "@/types";
 import {
   useGetJobsQuery,
@@ -39,8 +40,6 @@ import { WalkInInterviews } from "@/features/interviews/WalkInInterviews";
 import { SalaryCalculator } from "@/components/home/SalaryCalculator";
 import { TopCompaniesSection } from "@/components/home/TopCompaniesSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
-import { JobDetailModal } from "@/features/jobs/JobDetailModal";
-import { DirectHRConnectModal } from "@/features/interviews/DirectHRConnectModal";
 import { CitySelectorModal } from "@/components/home/CitySelectorModal";
 import { PostJobModal } from "@/features/employers/PostJobModal";
 import { CandidateAuthModal } from "@/features/auth/CandidateAuthModal";
@@ -52,7 +51,13 @@ import { Footer } from "@/components/home/Footer";
 import { useGetSettingsQuery } from "@/services/api/settingsApi";
 
 export default function HomePage() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const handleOpenJobPage = (job: Job) => {
+    const jobId = job.id || (job as any)._id;
+    router.push(`/job/${jobId}`);
+  };
   const { data: settingsData } = useGetSettingsQuery();
   const showPricingOnHomepage = settingsData?.show_pricing_on_homepage !== "false";
 
@@ -160,7 +165,7 @@ export default function HomePage() {
         searchQuery={searchQuery}
         onSearchChange={(q) => dispatch(setSearchQuery(q))}
         onSelectCategory={(catId) => dispatch(setCategory(catId))}
-        onViewDetails={(job) => dispatch(setSelectedJobForDetail(job))}
+        onViewDetails={handleOpenJobPage}
         onConnectHR={handleConnectHR}
         onResetFilters={() => dispatch(resetFilters())}
         currentPage={currentPage}
@@ -177,7 +182,7 @@ export default function HomePage() {
       <div id="walkins-section">
         <WalkInInterviews
           selectedCity={selectedCity}
-          onViewJob={(job) => dispatch(setSelectedJobForDetail(job))}
+          onViewJob={handleOpenJobPage}
           onConnectHR={handleConnectHR}
         />
       </div>
@@ -242,23 +247,8 @@ export default function HomePage() {
           dispatch(closeDashboard());
         }}
         appliedJobs={appliedJobs}
-        onViewJob={(j) => dispatch(setSelectedJobForDetail(j))}
+        onViewJob={handleOpenJobPage}
         onProfileUpdated={(u) => dispatch(setUser(u))}
-      />
-
-      <JobDetailModal
-        isOpen={!!jobForDetail}
-        onClose={() => dispatch(setSelectedJobForDetail(null))}
-        job={jobForDetail}
-        user={user}
-        onConnectHR={handleConnectHR}
-      />
-
-      <DirectHRConnectModal
-        isOpen={!!jobForHR}
-        onClose={() => dispatch(setSelectedJobForHR(null))}
-        job={jobForHR?.job || null}
-        mode={jobForHR?.mode || "call"}
       />
     </main>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Job } from "@/types";
 import { formatSalary, timeAgo } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -54,12 +55,12 @@ export const JobCard: React.FC<JobCardProps> = ({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
-          <h3
-            onClick={() => onViewDetails(job)}
-            className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors cursor-pointer line-clamp-2"
+          <Link
+            href={`/job/${job.id || (job as any)._id}`}
+            className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors cursor-pointer line-clamp-2 block"
           >
             {job.title}
-          </h3>
+          </Link>
           <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1 font-semibold">
             <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="truncate">{job.company}</span>
@@ -73,7 +74,10 @@ export const JobCard: React.FC<JobCardProps> = ({
         </div>
 
         {/* Logo */}
-        <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center shadow-sm">
+        <Link
+          href={`/job/${job.id || (job as any)._id}`}
+          className="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center shadow-sm"
+        >
           {job.companyLogo ? (
             <img
               src={job.companyLogo}
@@ -86,7 +90,7 @@ export const JobCard: React.FC<JobCardProps> = ({
               {job.company.charAt(0)}
             </div>
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Salary Badge */}
@@ -133,36 +137,15 @@ export const JobCard: React.FC<JobCardProps> = ({
       )}
 
       {/* Action CTA Buttons */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-100">
-        <Button
-          variant="call"
-          size="sm"
-          className="gap-1.5 text-xs font-bold"
-          onClick={() => onConnectHR(job, "call")}
+      <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
+        <Link
+          href={`/job/${job.id || (job as any)._id}`}
+          className="flex-1 py-2.5 px-3 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm"
         >
-          <Phone className="w-3.5 h-3.5 fill-current" />
-          <span>Call HR</span>
-        </Button>
-
-        <Button
-          variant="whatsapp"
-          size="sm"
-          className="gap-1.5 text-xs font-bold"
-          onClick={() => onConnectHR(job, "whatsapp")}
-        >
-          <MessageCircle className="w-3.5 h-3.5 fill-current" />
-          <span>WhatsApp</span>
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="col-span-2 sm:col-span-1 gap-1 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-          onClick={() => onViewDetails(job)}
-        >
-          <span>Details</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </Button>
+          <Briefcase className="w-3.5 h-3.5" />
+          <span>Apply on Job Page</span>
+          <ChevronRight className="w-3.5 h-3.5 ml-auto" />
+        </Link>
       </div>
     </div>
   );

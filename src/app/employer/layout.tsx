@@ -76,7 +76,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           <img
             src="/logo.png"
             alt="Instant Placement"
-            className="h-5.5 w-auto max-w-[130px] object-contain"
+            className="h-10 w-auto max-w-[190px] object-contain"
           />
           <span className="text-[10px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
             Employer
@@ -108,7 +108,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                 <img
                   src="/logo.png"
                   alt="Instant Placement"
-                  className="h-5.5 w-auto max-w-[130px] object-contain"
+                  className="h-10 w-auto max-w-[190px] object-contain"
                 />
                 <span className="text-[9px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1 py-0.5 rounded border border-blue-200">
                   Employer
@@ -200,7 +200,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
               <img
                 src="/logo.png"
                 alt="Instant Placement"
-                className="h-5.5 w-auto max-w-[140px] object-contain"
+                className="h-10 w-auto max-w-[190px] object-contain"
               />
             </Link>
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
