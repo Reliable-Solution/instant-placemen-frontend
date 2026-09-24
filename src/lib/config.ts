@@ -4,9 +4,12 @@ export const getApiBaseUrl = (): string => {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
   }
 
-  // Client-side detection: if running on live domain
+  // Client-side detection: if running on live or staging domain
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
+    if (hostname.includes("alwaysdata.net")) {
+      return `https://${hostname}/api/v1`;
+    }
     if (hostname === "instantplacement.in" || hostname.endsWith(".instantplacement.in")) {
       return "https://api.instantplacement.in/api/v1";
     }

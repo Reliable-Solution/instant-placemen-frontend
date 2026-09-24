@@ -53,13 +53,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           : "bg-white border-b border-slate-200"
       }`}
     >
-      <div className="container mx-auto px-4 h-18 sm:h-20 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo */}
         <a href="/" className="flex items-center shrink-0">
           <img
             src="/logo.png"
             alt="Instant Placement"
-            className="h-11 sm:h-13 w-auto max-w-[220px] sm:max-w-[270px] object-contain transition-all"
+            className="h-8 sm:h-12 w-auto max-w-[155px] sm:max-w-[260px] object-contain transition-all"
           />
         </a>
 
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {[
             { href: "#jobs-section", label: "Find Jobs", icon: Briefcase },
             { href: "#categories-section", label: "Categories", icon: LayoutGrid },
-            { href: "#walkins-section", label: "Walk-ins", icon: Calendar, accent: "text-rose-500" },
+            // { href: "#walkins-section", label: "Walk-ins", icon: Calendar, accent: "text-rose-500" },
             { href: "#salary-calculator", label: "Salaries", icon: Calculator, accent: "text-blue-500" },
           ].map((item) => (
             <a
@@ -83,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* City Selector (Desktop) */}
           <button
             onClick={onOpenCityModal}
@@ -117,9 +117,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </Link>
               <button
                 onClick={onOpenDashboard}
-                className="flex items-center gap-2 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 pl-1.5 pr-3 py-1.5 rounded-xl transition-all group"
+                className="flex items-center gap-2 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 pl-1.5 pr-2.5 sm:pr-3 py-1.5 rounded-xl transition-all group"
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-blue-600/20 group-hover:scale-105 transition-transform">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-blue-600/20 group-hover:scale-105 transition-transform">
                   {user.name ? user.name.charAt(0).toUpperCase() : "C"}
                 </div>
                 <span className="hidden sm:inline text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
@@ -135,18 +135,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuthModal}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl gap-1.5 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 transition-all"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-lg transition-all"
             >
-              <User className="w-4 h-4" />
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Login</span>
-              <span className="sm:hidden">Sign In</span>
+              <span className="sm:hidden text-xs">Sign In</span>
             </button>
           )}
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-1.5 sm:p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -183,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {[
               { href: "#jobs-section", label: "Find Verified Jobs", icon: Briefcase, bg: "bg-blue-50", color: "text-blue-600" },
               { href: "#categories-section", label: "Browse Categories", icon: LayoutGrid, bg: "bg-purple-50", color: "text-purple-600" },
-              { href: "#walkins-section", label: "Walk-in Interviews", icon: Calendar, bg: "bg-rose-50", color: "text-rose-500" },
+              // { href: "#walkins-section", label: "Walk-in Interviews", icon: Calendar, bg: "bg-rose-50", color: "text-rose-500" },
               { href: "#salary-calculator", label: "Salary Calculator", icon: Calculator, bg: "bg-emerald-50", color: "text-emerald-600" },
             ].map((item) => (
               <a

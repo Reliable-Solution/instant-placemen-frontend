@@ -62,11 +62,11 @@ export const TopCompaniesSection: React.FC<TopCompaniesProps> = ({
               className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-blue-300 shadow-card hover:shadow-card-hover transition-all text-left flex items-start justify-between group"
             >
               <div className="flex items-start gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5">
+                <div className="w-14 h-14 rounded-xl bg-white border border-slate-200/80 shadow-xs shrink-0 flex items-center justify-center p-1.5 overflow-hidden">
                   <img
                     src={company.logo}
                     alt={company.name}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
