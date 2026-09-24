@@ -4,7 +4,14 @@ export const dynamic = "force-dynamic";
 
 async function proxyRequest(request: NextRequest) {
   const url = new URL(request.url);
-  const backendUrl = `http://127.0.0.1:5100${url.pathname}${url.search}`;
+  const backendBase =
+    process.env.BACKEND_INTERNAL_URL ||
+    (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost")
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
+      : process.env.NODE_ENV === "production"
+      ? "https://api.instantplacement.in"
+      : "http://127.0.0.1:5100");
+  const backendUrl = `${backendBase}${url.pathname}${url.search}`;
 
   const headers = new Headers(request.headers);
   headers.delete("host");

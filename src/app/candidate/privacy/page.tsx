@@ -11,11 +11,12 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
 
 /* ─── Constants ─────────────────────────────────────────────────── */
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+const API_BASE = getApiBaseUrl();
+
 
 /* ─── Types ─────────────────────────────────────────────────────── */
 

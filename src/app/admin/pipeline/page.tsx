@@ -5,8 +5,10 @@ import {
   GitBranch, ChevronRight, CheckCircle2, Clock, AlertTriangle, RefreshCw,
   FileText, UserCheck, ShieldCheck, IndianRupee, Plus, X, ChevronDown,
 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+const API_BASE = getApiBaseUrl();
+
 
 const TIER_CONFIG = {
   module_1_resumes: {

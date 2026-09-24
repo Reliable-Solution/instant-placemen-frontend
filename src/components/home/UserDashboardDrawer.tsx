@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { getApiBaseUrl } from "@/lib/config";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Job } from "@/types";
@@ -72,7 +74,7 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
 
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+      const API_BASE = getApiBaseUrl();
       await fetch(`${API_BASE}/candidates/profile`, {
         method: "PUT",
         headers: {
@@ -108,7 +110,7 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
 
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+      const API_BASE = getApiBaseUrl();
       if (token) {
         await fetch(`${API_BASE}/users/profile`, {
           method: "PUT",
