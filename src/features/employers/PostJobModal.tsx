@@ -13,6 +13,8 @@ import {
   PlusCircle, CheckCircle2, ShieldCheck, Sparkles,
   FileText, UserCheck, Lock, Building2, Phone, Mail, ArrowRight, AlertTriangle,
 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
+
 
 interface PostJobModalProps {
   isOpen: boolean;
@@ -61,7 +63,7 @@ const TIER_INFO = {
   },
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+const getModalApiBase = () => getApiBaseUrl();
 
 export const PostJobModal: React.FC<PostJobModalProps> = ({
   isOpen,
@@ -136,7 +138,8 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
     setAuthLoading(true);
 
     try {
-      const endpoint = authMode === "login" ? `${API_BASE}/auth/login` : `${API_BASE}/auth/register`;
+      const apiBase = getModalApiBase();
+      const endpoint = authMode === "login" ? `${apiBase}/auth/login` : `${apiBase}/auth/register`;
       const payload =
         authMode === "login"
           ? { email: authEmail, password: authPassword }
@@ -147,7 +150,15 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(text || `Server error (${res.status}). Please check API connectivity.`);
+      }
 
       if (!res.ok || !data.success) throw new Error(data.message || "Authentication failed");
 

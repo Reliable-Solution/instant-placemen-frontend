@@ -1,4 +1,4 @@
-// Razorpay Client SDK Loader & Checkout Utility
+import { getApiBaseUrl } from "@/lib/config";
 
 declare global {
   interface Window {
@@ -47,7 +47,7 @@ export const initiateRazorpayCheckout = async (options: CheckoutOptions) => {
       return;
     }
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+    const API_BASE = getApiBaseUrl();
     const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
 
     // 1. Create order on backend

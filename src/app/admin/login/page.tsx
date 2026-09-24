@@ -8,6 +8,8 @@ import { setUser } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShieldCheck, Lock, Mail, Sparkles, ArrowRight, AlertCircle, Briefcase, ArrowLeft } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
+
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+      const API_BASE = getApiBaseUrl();
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

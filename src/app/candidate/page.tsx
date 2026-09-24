@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGetMyApplicationsQuery } from "@/services/api/jobsApi";
+import { getApiBaseUrl } from "@/lib/config";
+
 import {
   User,
   Upload,
@@ -19,8 +21,7 @@ import {
   Check,
 } from "lucide-react";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+const API_BASE = getApiBaseUrl();
 
 interface UserProfile {
   _id?: string;

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, ArrowRight, Sparkles, MessageSquare, RotateCcw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
+
 
 interface CandidateAuthModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+  const API_BASE = getApiBaseUrl();
 
   // Countdown timer for OTP resend
   useEffect(() => {

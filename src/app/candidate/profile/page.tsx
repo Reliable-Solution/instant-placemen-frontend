@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getApiBaseUrl } from "@/lib/config";
+
 import {
   User,
   Phone,
@@ -71,7 +73,7 @@ const SKILL_OPTIONS = [
   "Retail Sales", "Digital Marketing", "Delivery", "Graphic Design", "HR Recruitment"
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+const API_BASE = getApiBaseUrl();
 
 const INPUT_CLASS =
   "w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition";
