@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   useGetEmployerApplicantsQuery,
   useGetEmployerJobsQuery,
@@ -17,14 +18,22 @@ import {
   CheckCircle2,
   Sparkles,
   Search,
+  Filter,
+  Check,
+  Zap,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import DynamicPlanModal from "@/components/employer/DynamicPlanModal";
 
 export default function EmployerCandidateSearchPage() {
   const [jobFilter, setJobFilter] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expFilter, setExpFilter] = useState("ALL");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [planModalJob, setPlanModalJob] = useState<any | null>(null);
   const PAGE_SIZE = 9;
@@ -36,124 +45,184 @@ export default function EmployerCandidateSearchPage() {
     limit: PAGE_SIZE,
   });
 
-  const totalApplicants = (applicants as any).total ?? applicants.length;
+  const applicantList = Array.isArray(applicants) ? applicants : (applicants as any).data || [];
+  const totalApplicants = (applicants as any).total ?? applicantList.length;
   const totalPages = (applicants as any).totalPages ?? 1;
+
+  const handleOpenPlanModal = (app: any) => {
+    setPlanModalJob(app.job || { _id: app.jobId, title: app.job?.title || "Hiring Plan Mandate" });
+  };
 
   const openWhatsApp = (phone: string, name: string, jobTitle: string) => {
     const clean = phone.replace(/\D/g, "");
     const formatted = clean.length === 10 ? `91${clean}` : clean;
     const text = encodeURIComponent(
-      `Hi ${name}, we saw your application for the ${jobTitle} position at Instant Placement. We'd like to schedule an interview. Please share your availability.`
+      `Hi ${name}, we saw your profile on Instant Placement for the ${jobTitle} role. We'd like to schedule an interview with you. Please share your availability.`
     );
     window.open(`https://wa.me/${formatted}?text=${text}`, "_blank");
   };
 
+  // Filter candidates locally
+  const filteredCandidates = applicantList.filter((app: any) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchName = app.candidateName?.toLowerCase().includes(q);
+      const matchSkill = (app.skills || []).some((s: string) => s.toLowerCase().includes(q));
+      if (!matchName && !matchSkill) return false;
+    }
+    if (expFilter !== "ALL") {
+      if (expFilter === "Fresher" && !app.experience?.toLowerCase().includes("fresher")) return false;
+      if (expFilter === "Experienced" && app.experience?.toLowerCase().includes("fresher")) return false;
+    }
+    if (verifiedOnly && !app.commuteConfirmed) return false;
+    return true;
+  });
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* Header Banner - 100% Plan Based */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-7 rounded-3xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5 border border-white/10">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Candidate Pool
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Candidates who applied for your job postings. Unlock contact details by activating a Hiring Plan.
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold mb-2 border border-indigo-500/30">
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Plan-Based Talent Sourcing (No Per-Unlock Fees)</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Active Candidate Database</h1>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+            Source pre-screened jobseekers with verified commute. Full contact details are unlocked via your active Hiring Plan tier (Module 1, 2, or 3).
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400 font-semibold">Filter by Job:</span>
-          <select
-            value={jobFilter}
-            onChange={(e) => {
-              setJobFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="h-9 px-3 bg-white border border-slate-200 text-xs font-semibold text-slate-800 rounded-xl focus:outline-none shadow-sm"
-          >
-            <option value="ALL">All My Jobs ({jobs.length})</option>
-            {jobs.map((j: any) => (
-              <option key={j._id} value={j._id}>
-                {j.title} ({j.city})
-              </option>
-            ))}
-          </select>
+
+        {/* Plan Status Card */}
+        <div className="bg-white/10 backdrop-blur-md border border-white/15 p-4 rounded-2xl flex items-center justify-between gap-4 shrink-0 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-400/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-300 block font-medium">Recruitment Tiers</span>
+              <span className="text-sm font-black text-white">Module 1 / 2 / 3</span>
+            </div>
+          </div>
+          <Link href="/employer/plans">
+            <Button
+              size="sm"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs"
+            >
+              View Plans
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Info Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-            <Lock className="w-4 h-4 text-amber-300" />
+      {/* Filter and Search Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Keyword Search */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <Input
+              placeholder="Search candidate name or skill..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-10 pl-9 bg-slate-50 border-slate-200 text-xs rounded-xl focus:bg-white"
+            />
           </div>
+
+          {/* Role Filter */}
           <div>
-            <p className="text-sm font-bold">Contact details are masked for free accounts</p>
-            <p className="text-[11px] text-blue-200 mt-0.5">
-              Activate a Hiring Plan on a job to unlock full candidate phone numbers and WhatsApp access.
-            </p>
+            <select
+              value={jobFilter}
+              onChange={(e) => {
+                setJobFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full h-10 px-3 bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="ALL">All Associated Jobs ({jobs.length})</option>
+              {jobs.map((j: any) => (
+                <option key={j._id} value={j._id}>
+                  {j.title} ({j.city})
+                </option>
+              ))}
+            </select>
           </div>
+
+          {/* Experience Filter */}
+          <div>
+            <select
+              value={expFilter}
+              onChange={(e) => setExpFilter(e.target.value)}
+              className="w-full h-10 px-3 bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="ALL">All Experience Levels</option>
+              <option value="Fresher">Freshers (0 Yrs)</option>
+              <option value="Experienced">Experienced Candidates</option>
+            </select>
+          </div>
+
+          {/* Commute Verified Checkbox */}
+          <label className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+            <input
+              type="checkbox"
+              checked={verifiedOnly}
+              onChange={(e) => setVerifiedOnly(e.target.checked)}
+              className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+            />
+            <span className="text-xs font-bold text-slate-700">Commute Verified Only</span>
+          </label>
         </div>
-        <span className="text-xs font-bold bg-white/15 border border-white/20 px-3 py-1.5 rounded-xl shrink-0">
-          {totalApplicants} Applicant{totalApplicants !== 1 ? "s" : ""} Total
-        </span>
       </div>
 
-      {/* Candidate Cards */}
+      {/* Candidate Cards Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse h-52" />
+            <div key={i} className="bg-white rounded-3xl border border-slate-200 p-6 animate-pulse h-64" />
           ))}
         </div>
-      ) : applicants.length === 0 ? (
+      ) : filteredCandidates.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white border border-slate-200 rounded-3xl text-center gap-4">
           <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
             <Users className="w-7 h-7 text-slate-400" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-900 text-sm">No candidates yet</h3>
+            <h3 className="font-bold text-slate-900 text-sm">No candidate matches found</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-              Candidates who apply to your jobs will appear here. Make sure your jobs are active.
+              Try adjusting your search criteria or switch to "All Associated Jobs".
             </p>
           </div>
-          <a href="/employer/jobs" className="text-xs font-bold text-blue-600 hover:underline">
-            View My Job Listings →
-          </a>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {applicants.map((app: any) => {
-            const hasPlan = Boolean(app.job?.purchasedPlan && app.job.purchasedPlan.paymentStatus === "PAID");
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredCandidates.map((app: any) => {
+            const hasPurchasedPlan = Boolean(app.job?.purchasedPlan && app.job.purchasedPlan.paymentStatus === "PAID");
             const rawPhone: string = app.candidatePhone || "";
             const maskedPhone = rawPhone.length > 4
               ? "+91 " + rawPhone.slice(0, 2) + "••••••" + rawPhone.slice(-2)
               : "+91 ••••••••••";
-            const displayPhone = hasPlan ? "+91 " + rawPhone : maskedPhone;
+            const displayPhone = hasPurchasedPlan ? "+91 " + rawPhone : maskedPhone;
 
             return (
               <div
                 key={app._id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col gap-4 hover:shadow-md hover:border-blue-200 transition-all shadow-sm"
+                className="bg-white border border-slate-200 hover:border-indigo-300 rounded-3xl p-5 flex flex-col justify-between gap-4 hover:shadow-lg transition-all shadow-xs relative overflow-hidden group"
               >
-                {/* Candidate header */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
-                      {app.candidateName?.charAt(0) || "C"}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1">
-                        {app.candidateName}
-                        {hasPlan && <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
-                      </h4>
-                      <div className="flex items-center gap-1 text-[11px] text-slate-500">
-                        <MapPin className="w-3 h-3" />
-                        <span>{app.candidateCity || "Surat"}</span>
-                      </div>
-                    </div>
+                {/* Top Badge Row */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-extrabold border border-indigo-200">
+                      94% Match
+                    </span>
+                    {app.commuteConfirmed && (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold border border-emerald-200 flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5" />
+                        <span>Commute Verified</span>
+                      </span>
+                    )}
                   </div>
                   <Badge
-                    className={`text-[10px] shrink-0 ${
+                    className={`text-[10px] ${
                       app.status === "SELECTED"
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : app.status === "REJECTED"
@@ -165,62 +234,91 @@ export default function EmployerCandidateSearchPage() {
                   </Badge>
                 </div>
 
-                {/* Job applied for */}
-                <div className="flex items-center gap-1.5 text-[11px] bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                  <Briefcase className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span className="font-bold text-slate-700 truncate">{app.job?.title || "Job Mandate"}</span>
-                  {app.job?.city && <span className="text-slate-400 shrink-0">· {app.job.city}</span>}
+                {/* Candidate Info */}
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-black flex items-center justify-center text-base shadow-sm shrink-0">
+                    {app.candidateName?.charAt(0) || "C"}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                      {app.candidateName}
+                    </h4>
+                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      <span>{app.candidateCity || "Surat"}</span>
+                      {app.commuteLocation && (
+                        <span className="text-slate-400 truncate">({app.commuteLocation})</span>
+                      )}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Skills & Qualification row */}
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                    <GraduationCap className="w-3 h-3 text-slate-500" /> {app.qualification || "—"}
-                  </span>
-                  {app.experience && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                      {app.experience}
+                {/* Role and Qualifications */}
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                    <Briefcase className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span className="font-bold text-slate-800 truncate">{app.job?.title || "Job Mandate"}</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center gap-1">
+                      <GraduationCap className="w-3 h-3 text-slate-400" />
+                      <span>{app.qualification || "12th Pass"}</span>
                     </span>
-                  )}
+                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium">
+                      {app.experience || "Fresher"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Contact footer */}
+                {/* Contact & Plan-Based Access Footer */}
                 <div className="pt-3 border-t border-slate-100">
-                  {hasPlan ? (
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-xs font-bold text-emerald-700 flex-1 font-mono">
-                        <Phone className="w-3.5 h-3.5 shrink-0" />
+                  {hasPurchasedPlan ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono font-bold text-emerald-700">
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Hiring Plan Active</span>
+                        </span>
                         <span>{displayPhone}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => openWhatsApp(rawPhone, app.candidateName, app.job?.title || "our role")}
-                        className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1 rounded-xl shadow-sm"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        <span>WhatsApp</span>
-                      </Button>
-                      <a href={`tel:${rawPhone}`}>
-                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 rounded-xl border-slate-200 hover:bg-slate-50">
-                          <Phone className="w-3.5 h-3.5 text-slate-600" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => openWhatsApp(rawPhone, app.candidateName, app.job?.title || "our role")}
+                          className="h-9 bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5 rounded-xl shadow-xs font-bold"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>WhatsApp</span>
                         </Button>
-                      </a>
+                        <a href={`tel:${rawPhone}`} className="block">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full h-9 border-slate-200 hover:bg-slate-50 text-slate-700 text-xs gap-1.5 rounded-xl font-bold"
+                          >
+                            <Phone className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>Call</span>
+                          </Button>
+                        </a>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-                        <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Lock className="w-3 h-3 text-amber-500" />
+                          <span>Contact Masked</span>
+                        </span>
                         <span>{maskedPhone}</span>
                       </div>
                       <Button
                         size="sm"
-                        onClick={() =>
-                          setPlanModalJob(app.job || { _id: app.jobId, title: app.job?.title || "Job Mandate" })
-                        }
-                        className="h-8 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs gap-1.5 rounded-xl shadow-xs whitespace-nowrap"
+                        onClick={() => handleOpenPlanModal(app)}
+                        className="w-full h-9 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs gap-1.5 rounded-xl shadow-xs"
                       >
                         <Lock className="w-3 h-3 text-amber-300" />
-                        <span>Unlock</span>
+                        <span>Activate Hiring Plan to Unlock</span>
                       </Button>
                     </div>
                   )}

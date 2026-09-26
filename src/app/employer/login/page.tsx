@@ -58,7 +58,7 @@ function EmployerLoginContent() {
       const endpoint = mode === "login" ? `${apiBase}/auth/login` : `${apiBase}/auth/register`;
       const payload =
         mode === "login"
-          ? { email, password }
+          ? { email, password, expectedRole: "EMPLOYER" }
           : {
               email,
               password,

@@ -63,20 +63,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
       <div className="container mx-auto max-w-5xl relative z-10 text-center">
         {/* Top Trust Pill */}
-        <div className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md mb-6 shadow-inner transition-colors">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <ShieldCheck className="w-4 h-4 text-emerald-300" />
-          <span>India&apos;s Direct Candidate-to-HR Placement Network</span>
-          <span className="bg-emerald-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.2 rounded-full">
-            100% FREE
-          </span>
-        </div>
+        
 
         {/* Punchy Title */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.15] text-white">
           Find Verified Jobs{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-emerald-300 underline decoration-amber-400/40 underline-offset-8">
-            {selectedCity ? `in ${selectedCity}` : "Across India"}
+            {(!selectedCity || selectedCity.toLowerCase() === "surat" || selectedCity.toLowerCase() === "surat, gujarat")
+              ? "in Surat, Gujarat"
+              : selectedCity === "All India"
+              ? "Across India"
+              : `in ${selectedCity}`}
           </span>
           <br className="hidden sm:inline" /> & Call HR Directly
         </h1>
@@ -115,7 +112,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <MapPin className="w-5 h-5 text-rose-500 shrink-0" />
                 <div className="truncate">
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Job Location</p>
-                  <p className="text-sm font-bold text-slate-800 truncate">{selectedCity || "All Cities (India)"}</p>
+                  <p className="text-sm font-bold text-slate-800 truncate">
+                    {selectedCity ? (selectedCity.toLowerCase() === "surat" ? "Surat, Gujarat" : selectedCity) : "Surat, Gujarat"}
+                  </p>
                 </div>
               </button>
               <button

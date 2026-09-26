@@ -70,7 +70,7 @@ const PROTECTED_ITEMS: PrivacyItem[] = [
   {
     shared: false,
     label: "Phone Number",
-    description: "Protected until a verified employer unlocks via platform credits",
+    description: "Protected until a verified employer activates a hiring plan mandate",
   },
   {
     shared: false,

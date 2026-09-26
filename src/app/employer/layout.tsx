@@ -13,6 +13,8 @@ import {
   Users,
   Search,
   Building2,
+  CreditCard,
+  Coins,
   ArrowLeft,
   LogOut,
   ChevronRight,
@@ -43,8 +45,19 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
 
   useEffect(() => {
     if (mounted && !isLoginPage) {
-      const savedUser = localStorage.getItem("ip_user");
-      if (!savedUser) {
+      const savedUserStr = localStorage.getItem("ip_user");
+      if (!savedUserStr) {
+        router.push("/employer/login");
+        return;
+      }
+      try {
+        const u = JSON.parse(savedUserStr);
+        if (u.role !== "EMPLOYER" && u.role !== "ADMIN") {
+          // Candidate account trying to access employer portal! Redirect to employer login
+          router.push("/employer/login?role_mismatch=true");
+          return;
+        }
+      } catch {
         router.push("/employer/login");
       }
     }
@@ -60,6 +73,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
     { label: "Post New Job", href: "/employer/jobs/new", icon: PlusCircle },
     { label: "Applicant Pipeline", href: "/employer/applicants", icon: Users },
     { label: "Candidate Pool", href: "/employer/candidates", icon: Search },
+    { label: "Plans & Billing", href: "/employer/plans", icon: CreditCard },
     { label: "Company Profile", href: "/employer/profile", icon: Building2 },
   ];
 
@@ -255,6 +269,26 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
             })}
           </nav>
 
+          {/* Hiring Plan Widget (Module 1, 2, 3) */}
+          <div className="mx-3 mb-2 p-3 bg-gradient-to-br from-indigo-50/90 to-purple-50/60 rounded-2xl border border-indigo-200/80 shrink-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-extrabold text-indigo-600 tracking-wider block">
+                  Hiring Plan Tier
+                </span>
+                <span className="text-xs font-black text-indigo-950">
+                  {profile?.activePlanText || (profile as any)?.activePlan || "Module 1 Active"}
+                </span>
+              </div>
+              <Link
+                href="/employer/plans"
+                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] rounded-lg shadow-2xs transition-colors"
+              >
+                View Plans
+              </Link>
+            </div>
+          </div>
+
           {/* Footer Actions: Always docked at bottom */}
           <div className="p-3 border-t border-slate-100 space-y-1 bg-slate-50/50 mt-auto shrink-0">
             <Link
@@ -276,11 +310,65 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
       </aside>
 
       {/* Main Content Area: Offset by sidebar width (md:pl-64), scrolls naturally without dragging sidebar */}
-      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50">
+      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 pb-20 md:pb-8">
         <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>
+
+      {/* ─── Mobile Fixed Bottom Navigation Bar (30MobileEmployerDashboard.png) ─── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-1.5 flex items-center justify-between shadow-lg">
+        <Link
+          href="/employer"
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+            pathname === "/employer" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <LayoutDashboard className={`w-5 h-5 ${pathname === "/employer" ? "text-indigo-600" : "text-slate-400"}`} />
+          <span className="text-[10px] mt-0.5 tracking-tight">Overview</span>
+        </Link>
+
+        <Link
+          href="/employer/jobs"
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+            pathname === "/employer/jobs" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <Briefcase className={`w-5 h-5 ${pathname === "/employer/jobs" ? "text-indigo-600" : "text-slate-400"}`} />
+          <span className="text-[10px] mt-0.5 tracking-tight">My Jobs</span>
+        </Link>
+
+        {/* Elevated Center FAB: Post Job */}
+        <Link
+          href="/employer/jobs/new"
+          className="flex flex-col items-center justify-center -mt-6 group"
+        >
+          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-600/35 border-2 border-white group-active:scale-95 transition-all">
+            <PlusCircle className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-bold text-indigo-700 mt-1">Post Job</span>
+        </Link>
+
+        <Link
+          href="/employer/candidates"
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+            pathname === "/employer/candidates" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <Users className={`w-5 h-5 ${pathname === "/employer/candidates" ? "text-indigo-600" : "text-slate-400"}`} />
+          <span className="text-[10px] mt-0.5 tracking-tight">Candidates</span>
+        </Link>
+
+        <Link
+          href="/employer/plans"
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
+            pathname === "/employer/plans" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <CreditCard className={`w-5 h-5 ${pathname === "/employer/plans" ? "text-indigo-600" : "text-slate-400"}`} />
+          <span className="text-[10px] mt-0.5 tracking-tight">Billing</span>
+        </Link>
+      </nav>
     </div>
   );
 }

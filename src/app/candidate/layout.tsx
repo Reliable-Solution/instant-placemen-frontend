@@ -10,12 +10,14 @@ import {
   User,
   Upload,
   Briefcase,
+  Bookmark,
   ShieldCheck,
   ArrowLeft,
   LogOut,
   ChevronRight,
   Menu,
   X,
+  Layers,
 } from "lucide-react";
 
 export default function CandidateLayout({ children }: { children: React.ReactNode }) {
@@ -35,11 +37,20 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (mounted && !isLoginPage) {
-      const savedUser = localStorage.getItem("ip_user");
-
-      // If no user data at all, redirect to home
-      if (!savedUser) {
-        router.push("/");
+      const savedUserStr = localStorage.getItem("ip_user");
+      if (!savedUserStr) {
+        router.push("/candidate/login");
+        return;
+      }
+      try {
+        const u = JSON.parse(savedUserStr);
+        if (u.role !== "CANDIDATE") {
+          // Session belongs to ADMIN or EMPLOYER! Prevent leaking into candidate portal
+          router.push("/candidate/login?role_mismatch=true");
+          return;
+        }
+      } catch {
+        router.push("/candidate/login");
       }
     }
   }, [mounted, isLoginPage, router]);
@@ -65,6 +76,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
     { label: "My Profile & CV", href: "/candidate/profile", icon: User },
     { label: "Upload Resume", href: "/candidate/resume", icon: Upload },
     { label: "My Applications", href: "/candidate/applications", icon: Briefcase },
+    { label: "Saved Jobs", href: "/candidate/saved", icon: Bookmark },
     { label: "Privacy & Consent", href: "/candidate/privacy", icon: ShieldCheck },
   ];
 
@@ -265,11 +277,42 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content Area: Offset by sidebar width (md:pl-64), scrolls naturally without dragging sidebar */}
-      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50">
+      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 pb-20 md:pb-8">
         <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>
+
+      {/* ─── Mobile Fixed Bottom Navigation Bar (29MobileCandidateHome.png) ─── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex items-center justify-around shadow-lg">
+        {[
+          { label: "Home", href: "/candidate", icon: LayoutDashboard },
+          { label: "Find Jobs", href: "/jobs", icon: Briefcase },
+          { label: "Applied", href: "/candidate/applications", icon: Layers },
+          { label: "Saved", href: "/candidate/saved", icon: Bookmark },
+          { label: "Profile", href: "/candidate/profile", icon: User },
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all relative ${
+                isActive ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <div className="relative">
+                <Icon className={`w-5 h-5 ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
+                {isActive && (
+                  <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5 tracking-tight">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

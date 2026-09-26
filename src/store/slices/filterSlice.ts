@@ -12,7 +12,7 @@ interface FilterState {
 }
 
 const initialState: FilterState = {
-  selectedCity: "",
+  selectedCity: "Surat",
   selectedCategory: "",
   searchQuery: "",
   experience: "All",

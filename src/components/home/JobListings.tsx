@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Job, Category } from "@/types";
 import { JobCard } from "./JobCard";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
   Zap,
   MapPin,
   Briefcase,
+  ArrowRight,
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 
@@ -31,6 +33,7 @@ interface JobListingsProps {
   totalPages?: number;
   pageSize?: number;
   onPageChange?: (page: number) => void;
+  showViewAllButton?: boolean;
 }
 
 type TabFilter = "all" | "urgent" | "high-salary" | "fresher" | "wfh";
@@ -51,6 +54,7 @@ export const JobListings: React.FC<JobListingsProps> = ({
   totalPages,
   pageSize = 9,
   onPageChange,
+  showViewAllButton = false,
 }) => {
   const [activeTab, setActiveTab] = useState<TabFilter>("all");
   const [selectedExp, setSelectedExp] = useState<string>("All");
@@ -223,8 +227,22 @@ export const JobListings: React.FC<JobListingsProps> = ({
             </div>
 
 
+            {/* View All Openings CTA (for Home Page) */}
+            {showViewAllButton && (
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link
+                  href="/jobs"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5"
+                >
+                  {/* <Briefcase className="w-4 h-4" /> */}
+                  <span>View All Verified Openings</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                </Link>
+              </div>
+            )}
+
             {/* Pagination Controls */}
-            {totalPages && totalPages > 1 && onPageChange && currentPage && (
+            {!showViewAllButton && totalPages && totalPages > 1 && onPageChange && currentPage && (
               <div className="mt-8">
                 <Pagination
                   currentPage={currentPage}

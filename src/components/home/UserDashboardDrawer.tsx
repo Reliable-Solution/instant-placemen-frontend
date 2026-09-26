@@ -25,6 +25,7 @@ import {
   X,
   Sparkles,
   ExternalLink,
+  Bookmark,
 } from "lucide-react";
 
 import { CandidateOnboardingModal } from "@/components/candidate/CandidateOnboardingModal";
@@ -416,6 +417,26 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
                 {user?.consentToShareProfile ? "Make Private" : "Enable Sharing"}
               </Button>
             </div>
+          </div>
+
+          {/* Bookmarked / Saved Jobs Link */}
+          <div className="flex items-center justify-between p-3.5 bg-gradient-to-r from-amber-50/80 to-orange-50/60 border border-amber-200/80 rounded-2xl shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                <Bookmark className="w-4 h-4" />
+              </div>
+              <div>
+                <h5 className="text-xs font-bold text-slate-900">Saved Jobs & Bookmarks</h5>
+                <p className="text-[11px] text-slate-500 font-medium">Review saved openings</p>
+              </div>
+            </div>
+            <Link
+              href="/candidate/saved"
+              onClick={onClose}
+              className="text-xs font-bold text-amber-700 hover:text-amber-900 bg-white border border-amber-200 hover:bg-amber-50 px-3 py-1.5 rounded-xl transition-all shadow-2xs"
+            >
+              View Saved →
+            </Link>
           </div>
 
           {/* Applied Jobs Section */}
