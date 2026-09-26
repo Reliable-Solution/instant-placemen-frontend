@@ -82,9 +82,9 @@ export default function HomePage() {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  // Pagination State for Jobs Feed
+  // On homepage, only show 6 latest dynamic jobs
   const [currentPage, setCurrentPage] = React.useState(1);
-  const PAGE_SIZE = 9;
+  const PAGE_SIZE = 6;
 
   // Reset page when city, category or search query changes
   useEffect(() => {
@@ -171,6 +171,7 @@ export default function HomePage() {
         currentPage={currentPage}
         totalPages={totalPages}
         pageSize={PAGE_SIZE}
+        showViewAllButton={true}
         onPageChange={(page) => {
           setCurrentPage(page);
           const el = document.getElementById("jobs-section");
@@ -204,7 +205,7 @@ export default function HomePage() {
       <AppDownloadBanner />
 
       {/* 13. Verified Candidate Testimonials */}
-      <Testimonials />
+      {/* <Testimonials /> */}
 
       {/* 14. Interactive FAQ Accordion */}
       <FAQSection />

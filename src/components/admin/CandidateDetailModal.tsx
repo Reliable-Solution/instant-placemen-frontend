@@ -476,6 +476,66 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                   <p className="text-xs text-slate-400">No skills added yet.</p>
                 )}
               </div>
+
+              {/* ─── 360° Tele-Screening Dossier & Verification Checklist ─── */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                    <span>Recruiter Tele-Screening Verification</span>
+                  </h3>
+                  <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                    360° Dossier
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <label className="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                    <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+                    <div>
+                      <span className="font-bold text-slate-900 block leading-tight">Hindi &amp; Regional Fluency</span>
+                      <span className="text-[10px] text-slate-500">Candidate demonstrates clear telephone communication</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                    <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+                    <div>
+                      <span className="font-bold text-slate-900 block leading-tight">Notice Period: Immediate</span>
+                      <span className="text-[10px] text-slate-500">Available to join within 0-3 business days</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                    <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+                    <div>
+                      <span className="font-bold text-slate-900 block leading-tight">Salary Expectations Aligned</span>
+                      <span className="text-[10px] text-slate-500">Fits within budget of target job openings</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                    <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+                    <div>
+                      <span className="font-bold text-slate-900 block leading-tight">Commute Feasibility Verified</span>
+                      <span className="text-[10px] text-slate-500">Within manageable travel radius of job locations</span>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Recruiter Evaluation Notes */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Recruiter Assessment &amp; Screening Notes
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="Enter confidential notes regarding candidate communication, reliability, and employer suitability..."
+                    defaultValue="Candidate was polite and enthusiastic during tele-screening. Clear Hindi communication, immediate availability confirmed."
+                    className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
             </>
           ) : (
             /* ─── CV Document Tab ─── */

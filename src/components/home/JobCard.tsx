@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Job } from "@/types";
 import { formatSalary, timeAgo } from "@/lib/utils";
+import { isJobSaved, toggleSaveJob } from "@/lib/savedJobs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,7 @@ import {
   Zap,
   ChevronRight,
   Sparkles,
+  Bookmark,
 } from "lucide-react";
 
 interface JobCardProps {
@@ -31,6 +33,26 @@ export const JobCard: React.FC<JobCardProps> = ({
   onViewDetails,
   onConnectHR,
 }) => {
+  const targetId = String(job.id || (job as any)._id);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setSaved(isJobSaved(targetId));
+
+    const handleSavedChange = () => {
+      setSaved(isJobSaved(targetId));
+    };
+
+    window.addEventListener("ip_saved_jobs_changed", handleSavedChange);
+    return () => window.removeEventListener("ip_saved_jobs_changed", handleSavedChange);
+  }, [targetId]);
+
+  const handleBookmarkToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const isNowSaved = toggleSaveJob(job);
+    setSaved(isNowSaved);
+  };
   return (
     <div className="bg-white rounded-2xl border border-slate-200/90 hover:border-blue-300 shadow-card hover:shadow-card-hover transition-all duration-200 p-5 flex flex-col justify-between group">
       {/* Top Row */}
@@ -47,9 +69,24 @@ export const JobCard: React.FC<JobCardProps> = ({
             </Badge>
           )}
         </div>
-        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
-          {job.postedAt ? timeAgo(job.postedAt) : ""}
-        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+            {job.postedAt ? timeAgo(job.postedAt) : ""}
+          </span>
+          <button
+            type="button"
+            onClick={handleBookmarkToggle}
+            className={`p-1.5 rounded-lg border transition-all ${
+              saved
+                ? "bg-amber-50 border-amber-300 text-amber-500 shadow-2xs hover:bg-amber-100"
+                : "bg-slate-50 border-slate-200 text-slate-400 hover:text-amber-500 hover:bg-slate-100"
+            }`}
+            title={saved ? "Remove from Saved Jobs" : "Save this Job"}
+            aria-label={saved ? "Remove from Saved Jobs" : "Save this Job"}
+          >
+            <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-amber-400 text-amber-500" : ""}`} />
+          </button>
+        </div>
       </div>
 
       {/* Header */}
@@ -146,6 +183,19 @@ export const JobCard: React.FC<JobCardProps> = ({
           <span>Apply on Job Page</span>
           <ChevronRight className="w-3.5 h-3.5 ml-auto" />
         </Link>
+        <button
+          type="button"
+          onClick={handleBookmarkToggle}
+          className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all ${
+            saved
+              ? "bg-amber-50 border-amber-300 text-amber-600 hover:bg-amber-100"
+              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+          title={saved ? "Remove from Saved Jobs" : "Save this Job"}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-amber-400 text-amber-500" : "text-slate-400"}`} />
+          <span className="hidden sm:inline">{saved ? "Saved" : "Save"}</span>
+        </button>
       </div>
     </div>
   );

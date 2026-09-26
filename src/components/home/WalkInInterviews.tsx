@@ -42,7 +42,7 @@ export const WalkInInterviews: React.FC<WalkInInterviewsProps> = ({
               <span>Same-Day Spot Offer Letters</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Walk-in Interviews Today in {selectedCity}
+              Walk-in Interviews Today in {selectedCity ? (selectedCity.toLowerCase() === "surat" ? "Surat, Gujarat" : selectedCity) : "Surat, Gujarat"}
             </h2>
             <p className="text-sm text-slate-500 mt-1">
               Direct company premises interviews with zero waiting time. Carry your Aadhaar &amp; Resume.

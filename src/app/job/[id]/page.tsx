@@ -36,7 +36,9 @@ import {
   ChevronRight,
   AlertCircle,
   Send,
+  Bookmark,
 } from "lucide-react";
+import { isJobSaved, toggleSaveJob } from "@/lib/savedJobs";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -75,6 +77,30 @@ export default function JobDetailPage() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Sync saved status with storage and custom event
+  useEffect(() => {
+    if (jobId) {
+      setIsSaved(isJobSaved(jobId));
+    }
+    const handleSavedChange = () => {
+      if (jobId) setIsSaved(isJobSaved(jobId));
+    };
+    window.addEventListener("ip_saved_jobs_changed", handleSavedChange);
+    return () => window.removeEventListener("ip_saved_jobs_changed", handleSavedChange);
+  }, [jobId]);
+
+  const handleSaveToggle = () => {
+    if (!job) return;
+    const nowSaved = toggleSaveJob(job);
+    setIsSaved(nowSaved);
+    if (nowSaved) {
+      toast.success("Job saved to your bookmarks!");
+    } else {
+      toast.info("Job removed from saved bookmarks.");
+    }
+  };
 
   // Authentication check: ensure user is logged in
   useEffect(() => {
@@ -368,21 +394,34 @@ export default function JobDetailPage() {
                 </span>
               </div>
 
-              {/* Share Buttons */}
-              <div className="flex items-center gap-2 w-full justify-start md:justify-end">
+              {/* Share & Save Buttons */}
+              <div className="flex items-center gap-2 w-full justify-start md:justify-end flex-wrap">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSaveToggle}
+                  className={`text-xs gap-1.5 font-bold transition-all shadow-xs ${
+                    isSaved
+                      ? "bg-amber-400 text-slate-950 border-amber-300 hover:bg-amber-300"
+                      : "bg-white/10 text-white border-white/25 hover:bg-white/20"
+                  }`}
+                >
+                  <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-slate-950 text-slate-950" : ""}`} />
+                  <span>{isSaved ? "Saved" : "Save Job"}</span>
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={handleWhatsAppShare}
-                  className="bg-emerald-600/90 text-white border-emerald-500 hover:bg-emerald-600 text-xs gap-1.5"
+                  className="bg-emerald-600/90 text-white border-emerald-500 hover:bg-emerald-600 text-xs gap-1.5 font-semibold"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 fill-current" /> Share on WhatsApp
+                  <MessageCircle className="w-3.5 h-3.5 fill-current" /> Share
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={handleCopyLink}
-                  className="bg-white/10 text-white border-white/20 hover:bg-white/20 text-xs gap-1.5"
+                  className="bg-white/10 text-white border-white/20 hover:bg-white/20 text-xs gap-1.5 font-semibold"
                 >
                   {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   {copiedLink ? "Copied" : "Copy"}
@@ -594,9 +633,24 @@ export default function JobDetailPage() {
               <div className="border-b border-slate-100 pb-4">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-lg font-bold text-slate-900">1-Click Fast Apply</h3>
-                  <Badge variant="verified" className="text-[10px] py-0.5">
-                    100% Free
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveToggle}
+                      className={`px-2.5 py-1 rounded-lg border text-xs font-bold flex items-center gap-1 transition-all ${
+                        isSaved
+                          ? "bg-amber-50 border-amber-300 text-amber-600 hover:bg-amber-100"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      }`}
+                      title={isSaved ? "Saved to Bookmarks" : "Save this Job"}
+                    >
+                      <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-amber-400 text-amber-500" : "text-slate-400"}`} />
+                      <span>{isSaved ? "Saved" : "Save"}</span>
+                    </button>
+                    <Badge variant="verified" className="text-[10px] py-0.5">
+                      100% Free
+                    </Badge>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-500">
                   Zero consultancy fee. Direct candidate-to-HR placement.

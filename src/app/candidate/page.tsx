@@ -331,6 +331,54 @@ export default function CandidateOverviewPage() {
         </div>
       </div>
 
+      {/* Horizontal Application Pipeline Stepper (Mockup 10) */}
+      <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-sm font-extrabold text-slate-900">My Placement Pipeline</h2>
+            <p className="text-xs text-slate-500">Track your verified journey from application to joining</p>
+          </div>
+          <span className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-2.5 py-1 rounded-full">
+            Active Candidates
+          </span>
+        </div>
+        <div className="grid grid-cols-5 gap-2 relative">
+          {[
+            { step: "1", label: "Applied", desc: "Submitted CV", state: "done" },
+            { step: "2", label: "Screened", desc: "HR Verified", state: "done" },
+            { step: "3", label: "Interview", desc: "Slot Confirmed", state: "active" },
+            { step: "4", label: "Offer", desc: "Letter Released", state: "pending" },
+            { step: "5", label: "Joined", desc: "Day 1 Onboarding", state: "pending" },
+          ].map((stage, i) => (
+            <div key={i} className="flex flex-col items-center text-center relative group">
+              <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all ${
+                  stage.state === "done"
+                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
+                    : stage.state === "active"
+                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100 shadow-md shadow-indigo-600/30"
+                    : "bg-slate-100 text-slate-400 border border-slate-200"
+                }`}
+              >
+                {stage.state === "done" ? <Check className="w-4 h-4" /> : stage.step}
+              </div>
+              <span
+                className={`text-xs font-bold ${
+                  stage.state === "active"
+                    ? "text-indigo-600 font-extrabold"
+                    : stage.state === "done"
+                    ? "text-slate-900"
+                    : "text-slate-400"
+                }`}
+              >
+                {stage.label}
+              </span>
+              <span className="text-[10px] text-slate-400 hidden sm:block mt-0.5">{stage.desc}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Profile Completion Checklist */}
       <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">

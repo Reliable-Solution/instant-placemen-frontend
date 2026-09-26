@@ -30,6 +30,14 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "/icon.png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -45,6 +53,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var origSetAttr = Element.prototype.setAttribute;
+                Element.prototype.setAttribute = function(name, val) {
+                  if (name === 'bis_skin_checked') return;
+                  return origSetAttr.apply(this, arguments);
+                };
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-600 selection:text-white"
