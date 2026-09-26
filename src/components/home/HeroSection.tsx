@@ -74,9 +74,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Punchy Title */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.15] text-white">
-          Find Verified Jobs in{" "}
+          Find Verified Jobs{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-emerald-300 underline decoration-amber-400/40 underline-offset-8">
-            {selectedCity}
+            {selectedCity ? `in ${selectedCity}` : "Across India"}
           </span>
           <br className="hidden sm:inline" /> & Call HR Directly
         </h1>

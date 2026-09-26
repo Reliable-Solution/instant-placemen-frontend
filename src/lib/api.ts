@@ -1,8 +1,8 @@
 import { Job, Category, CityOption, JobFilterParams, ApplicationSubmission } from "@/types";
+import { getApiBaseUrl } from "@/lib/config";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" ? "/api" : "http://localhost:5100/api");
+const API_BASE_URL = getApiBaseUrl();
+
 
 export const jobApi = {
   getJobs: async (filters: JobFilterParams = {}): Promise<{ total: number; jobs: Job[] }> => {

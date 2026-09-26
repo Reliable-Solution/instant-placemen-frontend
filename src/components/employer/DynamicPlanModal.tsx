@@ -23,6 +23,8 @@ import {
 import { useCalculateJobPlanQuery } from "@/services/api/categoryPricingApi";
 import { useGetSettingsQuery } from "@/services/api/settingsApi";
 import { initiateRazorpayCheckout } from "@/services/razorpay";
+import { getApiBaseUrl } from "@/lib/config";
+
 
 interface DynamicPlanModalProps {
   isOpen: boolean;
@@ -76,7 +78,7 @@ export default function DynamicPlanModal({
     setPaymentError(null);
 
     const jobId = job.id || job._id;
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+    const API_BASE = getApiBaseUrl();
     const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
 
     // Module 2 & 3: No upfront payment, just activate

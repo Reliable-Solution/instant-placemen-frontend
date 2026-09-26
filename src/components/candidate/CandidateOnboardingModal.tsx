@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { getApiBaseUrl } from "@/lib/config";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -141,7 +143,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+        const API_BASE = getApiBaseUrl();
 
         const res = await fetch(`${API_BASE}/candidates/upload-cv`, {
           method: "POST",
@@ -177,7 +179,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
     }
 
     setIsSubmitting(true);
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100/api/v1";
+    const API_BASE = getApiBaseUrl();
     const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
 
     const payload = {

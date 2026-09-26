@@ -205,6 +205,16 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["ServiceModule"],
     }),
+    sendCandidateJobAlert: builder.mutation<
+      { success: boolean; message: string; candidateName?: string; jobTitle?: string; sendTo?: string },
+      { candidateId: string; jobId: string }
+    >({
+      query: ({ candidateId, jobId }) => ({
+        url: `/admin/candidates/${candidateId}/send-job-alert`,
+        method: "POST",
+        body: { jobId },
+      }),
+    }),
   }),
 });
 
@@ -228,6 +238,7 @@ export const {
   useUpdatePlanMutation,
   useDeletePlanMutation,
   useToggleArchivePlanMutation,
+  useSendCandidateJobAlertMutation,
 } = adminApi;
 
 

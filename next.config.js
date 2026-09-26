@@ -12,14 +12,22 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    const backendBase =
+      process.env.BACKEND_INTERNAL_URL ||
+      (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost")
+        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
+        : process.env.NODE_ENV === "production"
+        ? "https://api.instantplacement.in"
+        : "http://127.0.0.1:5100");
+
     return [
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:5100/api/:path*",
+        destination: `${backendBase}/api/:path*`,
       },
       {
         source: "/uploads/:path*",
-        destination: "http://127.0.0.1:5100/uploads/:path*",
+        destination: `${backendBase}/uploads/:path*`,
       },
     ];
   },

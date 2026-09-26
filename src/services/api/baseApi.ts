@@ -1,15 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { getApiBaseUrl } from "@/lib/config";
 
-const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== "undefined") return "/api/v1";
-  return "http://localhost:5100/api/v1";
-};
 
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: getBaseUrl(),
+    baseUrl: getApiBaseUrl(),
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("ip_token");

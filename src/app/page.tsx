@@ -178,14 +178,14 @@ export default function HomePage() {
         }}
       />
 
-      {/* 6. Spot Walk-in Interviews Today Section */}
-      <div id="walkins-section">
+      {/* 6. Spot Walk-in Interviews Today Section (Hidden per request) */}
+      {/* <div id="walkins-section">
         <WalkInInterviews
           selectedCity={selectedCity}
           onViewJob={handleOpenJobPage}
           onConnectHR={handleConnectHR}
         />
-      </div>
+      </div> */}
 
       {/* 7. Salary Benchmarks Calculator */}
       <div id="salary-calculator">
