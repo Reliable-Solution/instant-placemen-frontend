@@ -343,8 +343,8 @@ function CandidateLoginForm() {
 
         {/* Alerts */}
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-start gap-2 animate-fadeIn">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2 animate-fadeIn">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <span className="font-medium leading-tight">{errorMessage}</span>
           </div>
         )}
@@ -429,7 +429,7 @@ function CandidateLoginForm() {
                     <label className="text-xs font-bold text-slate-700 block">
                       Enter 6-Digit WhatsApp Code
                     </label>
-                    <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
                       Instant Auto-Verify
                     </span>
                   </div>
@@ -501,7 +501,7 @@ function CandidateLoginForm() {
                     Full Name <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="e.g. Rahul Sharma"
@@ -547,7 +547,7 @@ function CandidateLoginForm() {
                 Email Address <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   placeholder="candidate@example.com"
@@ -569,11 +569,11 @@ function CandidateLoginForm() {
                   Password <span className="text-rose-500">*</span>
                 </label>
                 {isSignUp && (
-                  <span className="text-[10px] text-slate-400">Min. 6 characters</span>
+                  <span className="text-xs text-slate-500">Min. 6 characters</span>
                 )}
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder={isSignUp ? "Create a secure password" : "Enter your password"}
@@ -588,7 +588,7 @@ function CandidateLoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 transition"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>

@@ -61,7 +61,7 @@ export const TrustStats: React.FC = () => {
                   {stat.value}
                 </h3>
                 <p className="text-xs sm:text-sm font-bold text-slate-800">{stat.label}</p>
-                <p className="text-[11px] text-slate-500 font-medium">{stat.subtext}</p>
+                <p className="text-xs text-slate-500 font-medium">{stat.subtext}</p>
               </div>
             </div>
           );

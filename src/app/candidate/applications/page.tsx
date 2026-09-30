@@ -148,9 +148,9 @@ export default function CandidateApplicationsPage() {
     return [];
   }, [apiData]);
 
-  // Combine API apps with demo/mock apps if empty so that Mockup 12's full experience is visible
+  // Combine API apps (mock seeding only in development; prod shows empty state)
   const appliedJobs: AppliedJob[] = useMemo(() => {
-    let list: AppliedJob[] = apiApplications.map((app: any) => {
+    const list: AppliedJob[] = apiApplications.map((app: any) => {
       const job = app.job || {};
       const status = (app.status || "APPLIED").toLowerCase();
       return {
@@ -178,9 +178,9 @@ export default function CandidateApplicationsPage() {
       };
     });
 
-    if (list.length === 0) {
-      // Seed rich mock applications matching Mockup 12
-      list = [
+    if (list.length === 0 && process.env.NODE_ENV === "development") {
+      // Seed rich mock applications for local UI development only
+      return [
         {
           id: "app-1",
           title: "Telecaller — Hindi & Gujarati",
@@ -351,7 +351,22 @@ export default function CandidateApplicationsPage() {
 
       {/* Applications Stream */}
       <div className="space-y-4">
-        {filteredJobs.map((job, idx) => {
+        {filteredJobs.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+            <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-sm font-bold text-slate-700">No applications yet</p>
+            <p className="text-xs text-slate-500 mt-1 mb-4">
+              You haven&apos;t applied to any jobs yet. Browse verified openings and apply in one tap.
+            </p>
+            <Link
+              href="/jobs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+            >
+              <span>Browse Jobs</span>
+            </Link>
+          </div>
+        ) : (
+        filteredJobs.map((job, idx) => {
           const jobId = job.id || job._id || `job-${idx}`;
           const isInterview = (job.status || "").toLowerCase().includes("interview");
           const isConfirmed = confirmedSlots[jobId];
@@ -382,7 +397,7 @@ export default function CandidateApplicationsPage() {
                 </div>
 
                 <span
-                  className={`text-[11px] font-bold px-3 py-1 rounded-full border shrink-0 capitalize ${statusColor(
+                  className={`text-xs font-bold px-3 py-1 rounded-full border shrink-0 capitalize ${statusColor(
                     job.status || "applied"
                   )}`}
                 >
@@ -393,12 +408,12 @@ export default function CandidateApplicationsPage() {
               {/* Salary & Application Timestamp */}
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-500 pt-2 border-t border-slate-100">
                 <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                  <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                  <Briefcase className="w-3.5 h-3.5 text-slate-500" />
                   <span>{formatSalary(job)}</span>
                 </div>
                 {job.appliedAt && (
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
                     <span>Applied {formatDate(job.appliedAt)}</span>
                   </div>
                 )}
@@ -413,12 +428,12 @@ export default function CandidateApplicationsPage() {
                       <span>Interview Scheduled</span>
                     </div>
                     {isConfirmed ? (
-                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         Confirmed
                       </span>
                     ) : (
-                      <span className="text-[11px] font-bold text-amber-700 bg-amber-100/80 border border-amber-300 px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-amber-700 bg-amber-100/80 border border-amber-300 px-2.5 py-0.5 rounded-full">
                         Action Required
                       </span>
                     )}
@@ -426,7 +441,7 @@ export default function CandidateApplicationsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
                     <div className="bg-white/80 p-2.5 rounded-xl border border-purple-100">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                      <span className="text-xs uppercase font-bold text-slate-500 block">
                         Date & Time
                       </span>
                       <strong className="text-slate-900 font-bold">
@@ -434,7 +449,7 @@ export default function CandidateApplicationsPage() {
                       </strong>
                     </div>
                     <div className="bg-white/80 p-2.5 rounded-xl border border-purple-100">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                      <span className="text-xs uppercase font-bold text-slate-500 block">
                         Venue / Contact
                       </span>
                       <span className="font-semibold text-slate-800 line-clamp-1">
@@ -470,7 +485,7 @@ export default function CandidateApplicationsPage() {
               )}
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );

@@ -109,14 +109,14 @@ export default function AdminApplicationsPage() {
         {isLoading ? (
           <TableSkeleton rows={5} />
         ) : applications.length === 0 ? (
-          <div className="p-12 text-center text-xs text-slate-400">
+          <div className="p-12 text-center text-xs text-slate-500">
             No candidate applications found for the selected stage.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <tr className="border-b border-slate-200 bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider">
                   <th className="p-4 pl-6">Candidate Details</th>
                   <th className="p-4">Applied Job & Company</th>
                   <th className="p-4">Profile Match</th>
@@ -129,33 +129,33 @@ export default function AdminApplicationsPage() {
                   <tr key={app._id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-4 pl-6">
                       <div className="font-bold text-slate-900 text-xs">{app.candidateName}</div>
-                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
+                      <div className="flex items-center gap-1.5 text-slate-500 text-xs mt-0.5">
                         <Phone className="w-3 h-3 text-emerald-600" />
                         <span className="font-semibold text-emerald-600">{app.candidatePhone}</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                      <span className="text-xs text-slate-500 block mt-0.5">
                         {app.candidateCity || "Surat Gujarat"}
                       </span>
                     </td>
 
                     <td className="p-4">
                       <div className="font-bold text-blue-600 text-xs">{app.jobTitle}</div>
-                      <span className="text-[11px] text-slate-500 block mt-0.5 font-medium">{app.company}</span>
+                      <span className="text-xs text-slate-500 block mt-0.5 font-medium">{app.company}</span>
                     </td>
 
                     <td className="p-4 text-slate-700">
-                      <div className="text-[11px] space-y-0.5">
+                      <div className="text-xs space-y-0.5">
                         <div>
-                          <span className="text-slate-400">Exp:</span> {app.experience || "Fresher"}
+                          <span className="text-slate-500">Exp:</span> {app.experience || "Fresher"}
                         </div>
                         <div>
-                          <span className="text-slate-400">Edu:</span> {app.qualification || "12th Pass"}
+                          <span className="text-slate-500">Edu:</span> {app.qualification || "12th Pass"}
                         </div>
                       </div>
                     </td>
 
                     <td className="p-4">
-                      <Badge className={`text-[10px] ${getStageBadgeColor(app.status)}`}>
+                      <Badge className={`text-xs ${getStageBadgeColor(app.status)}`}>
                         {app.status.replace(/_/g, " ")}
                       </Badge>
                     </td>

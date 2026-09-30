@@ -196,7 +196,7 @@ export default function AdminSettingsPage() {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-bold text-slate-800">PostgreSQL / MongoDB</span>
           </div>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
             Healthy (4ms)
           </span>
         </div>
@@ -206,7 +206,7 @@ export default function AdminSettingsPage() {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-bold text-slate-800">WhatsApp Business API</span>
           </div>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
             Active · Meta Webhook
           </span>
         </div>
@@ -216,7 +216,7 @@ export default function AdminSettingsPage() {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-bold text-slate-800">Razorpay Payment Gateway</span>
           </div>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
             Live Mode
           </span>
         </div>
@@ -241,7 +241,7 @@ export default function AdminSettingsPage() {
           <div className="py-3.5 flex items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-slate-900 block">Candidate WhatsApp One-Click Apply</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Allow candidates to open pre-filled WhatsApp application messages directly to verified recruiters.
               </span>
             </div>
@@ -260,7 +260,7 @@ export default function AdminSettingsPage() {
           <div className="py-3.5 flex items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-slate-900 block">AI Commute Feasibility Engine</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Check candidate residency vs employer work location before allowing instant job applications.
               </span>
             </div>
@@ -279,7 +279,7 @@ export default function AdminSettingsPage() {
           <div className="py-3.5 flex items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-slate-900 block">Transparent Plan &amp; Billing Display</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Show official GST invoice breakdown and hiring plan pricing to prospective employers.
               </span>
             </div>
@@ -298,7 +298,7 @@ export default function AdminSettingsPage() {
           <div className="py-3.5 flex items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-slate-900 block">Auto-Approve GST Registrations</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Instantly grant verified badge if GST checksum algorithm validates without manual KYC queue review.
               </span>
             </div>
@@ -320,7 +320,7 @@ export default function AdminSettingsPage() {
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                 <span>Global Maintenance Mode</span>
               </span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Puts the public platform in read-only status and displays maintenance message to all visitors.
               </span>
             </div>
@@ -410,7 +410,7 @@ export default function AdminSettingsPage() {
                 setFormValues({ ...formValues, support_whatsapp_link: e.target.value })
               }
               placeholder="https://wa.me/917863022284?text=Hello%20Instant%20Placement%20Support"
-              className="h-10 bg-slate-50 border-slate-200 text-xs rounded-xl focus:bg-white font-mono text-[11px]"
+              className="h-10 bg-slate-50 border-slate-200 text-xs rounded-xl focus:bg-white font-mono text-xs"
             />
           </div>
 

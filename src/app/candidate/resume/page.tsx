@@ -40,6 +40,11 @@ export default function CandidateResumePage() {
   const [uploadError, setUploadError] = useState("");
   const [dragActive, setDragActive] = useState(false);
 
+  // Blob preview state for authenticated PDF display
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [isLoadingBlob, setIsLoadingBlob] = useState(false);
+  const [blobError, setBlobError] = useState<string | null>(null);
+
   /* ── Load user on mount ── */
 
   useEffect(() => {
@@ -87,6 +92,61 @@ export default function CandidateResumePage() {
       setIsReady(true);
     }
   }, [router]);
+
+  /* ── Load authenticated resume blob for iframe preview ── */
+  useEffect(() => {
+    if (!user?.resumeUrl) {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+        setBlobUrl(null);
+      }
+      return;
+    }
+
+    let isCancelled = false;
+    let localBlobUrl: string | null = null;
+    setIsLoadingBlob(true);
+    setBlobError(null);
+
+    const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : null;
+    const targetUrl = user.resumeUrl.startsWith("http")
+      ? user.resumeUrl
+      : `${SERVER_BASE}${user.resumeUrl}`;
+
+    const fetchUrl = token
+      ? `${targetUrl}${targetUrl.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
+      : targetUrl;
+
+    fetch(fetchUrl, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `Failed to load resume (HTTP ${res.status})`);
+        }
+        return res.blob();
+      })
+      .then((blob) => {
+        if (isCancelled) return;
+        localBlobUrl = URL.createObjectURL(blob);
+        setBlobUrl(localBlobUrl);
+      })
+      .catch((err: any) => {
+        if (isCancelled) return;
+        setBlobError(err?.message || "Failed to load resume preview.");
+      })
+      .finally(() => {
+        if (!isCancelled) setIsLoadingBlob(false);
+      });
+
+    return () => {
+      isCancelled = true;
+      if (localBlobUrl) {
+        URL.revokeObjectURL(localBlobUrl);
+      }
+    };
+  }, [user?.resumeUrl]);
 
   /* ── Helpers ── */
 
@@ -246,15 +306,47 @@ export default function CandidateResumePage() {
   }
 
   const hasResume = Boolean(user?.resumeUrl);
-  // Relative same-origin path through Next.js rewrite ensures zero cross-origin / iframe port blocking
-  const previewUrl = user?.resumeUrl?.startsWith("http")
+  const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : "";
+  const rawResumeUrl = user?.resumeUrl?.startsWith("http")
     ? user.resumeUrl
-    : (user?.resumeUrl || "");
-  const fullResumeUrl = user?.resumeUrl?.startsWith("http")
-    ? user.resumeUrl
-    : `${SERVER_BASE}${user?.resumeUrl}`;
+    : (user?.resumeUrl ? `${SERVER_BASE}${user.resumeUrl}` : "");
 
+  const authenticatedResumeUrl = token && rawResumeUrl
+    ? `${rawResumeUrl}${rawResumeUrl.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
+    : rawResumeUrl;
+
+  const previewSource = blobUrl || authenticatedResumeUrl;
   const displayName = user?.resumeFile || user?.resumeUrl?.split("/").pop() || "Resume.pdf";
+
+  const handleOpenInNewTab = () => {
+    if (blobUrl) {
+      window.open(blobUrl, "_blank");
+      return;
+    }
+    if (authenticatedResumeUrl) {
+      window.open(authenticatedResumeUrl, "_blank");
+    }
+  };
+
+  const handleDownload = () => {
+    if (blobUrl) {
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = displayName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+    if (authenticatedResumeUrl) {
+      const a = document.createElement("a");
+      a.href = authenticatedResumeUrl;
+      a.download = displayName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -321,12 +413,12 @@ export default function CandidateResumePage() {
 
       {/* ─── Feedback Messages ─── */}
       {uploadError && (
-        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-800 font-medium">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+        <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 text-sm text-rose-800 font-medium">
+          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
           <span>{uploadError}</span>
           <button
             onClick={() => setUploadError("")}
-            className="ml-auto text-red-400 hover:text-red-600 transition-colors"
+            className="ml-auto text-red-400 hover:text-rose-600 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -361,29 +453,28 @@ export default function CandidateResumePage() {
                     <h2 className="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
                       {displayName}
                     </h2>
-                    <p className="text-[11px] text-slate-500">PDF Document • Active on Candidate Profile</p>
+                    <p className="text-xs text-slate-500">PDF Document • Active on Candidate Profile</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <a
-                    href={fullResumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={handleOpenInNewTab}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Open in New Tab</span>
-                  </a>
+                  </button>
 
-                  <a
-                    href={fullResumeUrl}
-                    download={displayName}
+                  <button
+                    type="button"
+                    onClick={handleDownload}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download CV</span>
-                  </a>
+                  </button>
 
                   <button
                     type="button"
@@ -397,7 +488,7 @@ export default function CandidateResumePage() {
                   <button
                     type="button"
                     onClick={handleRemoveResume}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-xs font-bold transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-bold transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remove</span>
@@ -407,24 +498,50 @@ export default function CandidateResumePage() {
 
               {/* Embedded Document Viewer */}
               <div className="w-full bg-slate-100/50 p-2 sm:p-4">
-                <div className="w-full bg-white rounded-xl shadow-inner border border-slate-200 overflow-hidden">
-                  <iframe
-                    src={`${previewUrl}#navpanes=0&pagemode=none&view=FitH`}
-                    className="w-full h-[850px] border-0 bg-white"
-                    title="Resume Document Viewer"
-                  />
+                <div className="w-full bg-white rounded-xl shadow-inner border border-slate-200 overflow-hidden min-h-[600px] flex flex-col justify-center items-center">
+                  {isLoadingBlob ? (
+                    <div className="py-24 text-center space-y-3">
+                      <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                      <p className="text-slate-600 text-sm font-medium">Loading your CV document preview…</p>
+                    </div>
+                  ) : blobError ? (
+                    <div className="py-16 px-6 text-center space-y-4 max-w-md">
+                      <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                        <AlertCircle className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-800">Preview Could Not Be Loaded Directly</h3>
+                        <p className="text-xs text-slate-500 mt-1">{blobError}</p>
+                      </div>
+                      <div className="flex justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={handleOpenInNewTab}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Open in New Tab</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : previewSource ? (
+                    <iframe
+                      src={`${previewSource}#navpanes=0&pagemode=none&view=FitH`}
+                      className="w-full h-[850px] border-0 bg-white"
+                      title="Resume Document Viewer"
+                    />
+                  ) : null}
                 </div>
                 <div className="mt-3 text-center">
                   <p className="text-xs text-slate-500">
                     If the document preview does not load on your browser,{" "}
-                    <a
-                      href={fullResumeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 font-bold hover:underline"
+                    <button
+                      type="button"
+                      onClick={handleOpenInNewTab}
+                      className="text-blue-600 font-bold hover:underline inline-flex items-center gap-1"
                     >
                       click here to open in full screen
-                    </a>
+                    </button>
                     .
                   </p>
                 </div>

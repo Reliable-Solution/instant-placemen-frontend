@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGetMyApplicationsQuery } from "@/services/api/jobsApi";
 import { getApiBaseUrl } from "@/lib/config";
+import { DashboardHeader, StatCard, ContentCard } from "@/components/dashboard/Dashboard";
 
 import {
   User,
@@ -45,10 +46,11 @@ export default function CandidateOverviewPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Fetch application count from backend API
   const { data: myApplications = [] } = useGetMyApplicationsQuery();
-  const appliedCount = myApplications.length;
+  const appliedCount = Array.isArray(myApplications) ? myApplications.length : 0;
 
   useEffect(() => {
     const raw =
@@ -65,7 +67,18 @@ export default function CandidateOverviewPage() {
       return;
     }
 
-    const u: UserProfile = raw ? JSON.parse(raw) : {};
+    let u: UserProfile = {};
+    try {
+      u = raw ? (JSON.parse(raw) as UserProfile) : {};
+    } catch (err) {
+      console.error("Corrupt ip_user in localStorage, clearing session:", err);
+      try {
+        localStorage.removeItem("ip_user");
+        localStorage.removeItem("ip_token");
+      } catch {}
+      router.replace("/");
+      return;
+    }
     setUser(u);
 
     if (token) {
@@ -79,7 +92,10 @@ export default function CandidateOverviewPage() {
         .then((data) => {
           if (data?.user) setUser(data.user);
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.error("Failed to fetch candidate profile:", err);
+          setLoadError("Could not refresh profile from server. Showing cached data.");
+        })
         .finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
@@ -254,163 +270,89 @@ export default function CandidateOverviewPage() {
 
   return (
     <div className="space-y-6">
-      {/* Profile Strength Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white shadow-xl shadow-blue-900/20">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-200 text-slate-900 font-extrabold text-3xl flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
-            {initials}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-extrabold text-white">
-                {user.name || "Complete Your Profile"}
-              </h1>
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] px-2 py-0.5 rounded-full font-bold">
-                ✓ VERIFIED
-              </span>
-              {user.consentToShareProfile && (
-                <span className="bg-blue-400/20 text-blue-200 border border-blue-400/30 text-[11px] px-2 py-0.5 rounded-full font-bold">
-                  ✓ HR VISIBLE
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-blue-200 mt-1 flex items-center gap-2 flex-wrap">
-              {user.phone && <span>+91 {user.phone}</span>}
-              {user.city && (
-                <span>• 📍 {user.locality ? `${user.locality}, ` : ""}{user.city}</span>
-              )}
-              {user.experience && <span>• 💼 {user.experience}</span>}
-              {user.qualification && <span>• 🎓 {user.qualification}</span>}
-            </p>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-4 min-w-[170px] shrink-0 border border-white/15">
-            <p className="text-[11px] text-blue-200 font-semibold mb-1 flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 text-amber-400" />
-              Profile Strength
-            </p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-white">{completionScore}%</span>
-              <span className="text-xs text-blue-200 font-medium">complete</span>
-            </div>
-            <div className="w-full bg-white/20 rounded-full h-2 mt-2 overflow-hidden">
-              <div
-                className="h-2 rounded-full transition-all duration-500"
-                style={{
-                  width: `${completionScore}%`,
-                  background: completionScore >= 80 ? "#22c55e" : completionScore >= 50 ? "#f59e0b" : "#ef4444",
-                }}
-              />
-            </div>
-            {!user.consentToShareProfile ? (
-              <p className="text-[10px] text-amber-300 mt-1.5 font-medium leading-tight">
-                ⚠ Enable sharing to receive HR calls
-              </p>
-            ) : (
-              <p className="text-[10px] text-emerald-300 mt-1.5 font-medium">
-                ✓ Active for recruiters
-              </p>
+      {loadError && (
+        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+          <span>{loadError}</span>
+        </div>
+      )}
+      {/* Page header — same pattern as employer/admin */}
+      <DashboardHeader
+        badge="Candidate Workspace"
+        badgeColor="text-emerald-700 bg-emerald-50 border-emerald-200"
+        title={user.name || "Complete Your Profile"}
+        subtitle={
+          <span className="flex items-center gap-2 flex-wrap">
+            {user.phone && <span>+91 {user.phone}</span>}
+            {user.city && (
+              <span>• 📍 {user.locality ? `${user.locality}, ` : ""}{user.city}</span>
             )}
-          </div>
-        </div>
+            {user.experience && <span>• 💼 {user.experience}</span>}
+            {user.qualification && <span>• 🎓 {user.qualification}</span>}
+            <span className="bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
+              ✓ VERIFIED
+            </span>
+            {user.consentToShareProfile && (
+              <span className="bg-blue-400/20 text-blue-700 border border-blue-400/30 px-2 py-0.5 rounded-full font-bold">
+                ✓ HR VISIBLE
+              </span>
+            )}
+          </span>
+        }
+        actionHref="/jobs"
+        actionLabel={<><Briefcase className="w-4 h-4" /><span>Find Jobs</span></>}
+      />
 
-        <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/10">
-          <div className="text-center">
-            <p className="text-xl font-extrabold text-white">{appliedCount}</p>
-            <p className="text-[11px] text-blue-300 font-medium mt-0.5">Applied Jobs</p>
-          </div>
-          <div className="text-center border-x border-white/10">
-            <p className="text-xl font-extrabold text-white">{skillsCount}</p>
-            <p className="text-[11px] text-blue-300 font-medium mt-0.5">Skills</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xl font-extrabold text-emerald-400">
-              {hasResume ? "1 PDF" : "Digital CV"}
-            </p>
-            <p className="text-[11px] text-blue-300 font-medium mt-0.5">Resume Status</p>
-          </div>
-        </div>
+      {/* 4 Key Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Profile Strength"
+          value={`${completionScore}%`}
+          sub={user.consentToShareProfile ? "✓ Active for recruiters" : "⚠ Enable sharing for HR calls"}
+          icon={Star}
+          color="text-amber-600 bg-amber-50 border-amber-200"
+          href="/candidate/profile"
+        />
+        <StatCard
+          title="Applied Jobs"
+          value={appliedCount}
+          sub="Track status"
+          icon={Briefcase}
+          color="text-blue-600 bg-blue-50 border-blue-200"
+          href="/candidate/applications"
+        />
+        <StatCard
+          title="Skills Added"
+          value={skillsCount}
+          sub="Add at least 3"
+          icon={Zap}
+          color="text-indigo-600 bg-indigo-50 border-indigo-200"
+          href="/candidate/profile"
+        />
+        <StatCard
+          title="Resume Status"
+          value={hasResume ? "1 PDF" : "Missing"}
+          sub={hasResume ? "Auto-extracted" : "Upload PDF"}
+          icon={Upload}
+          color="text-rose-600 bg-rose-50 border-rose-200"
+          href="/candidate/resume"
+        />
       </div>
 
-      {/* Horizontal Application Pipeline Stepper (Mockup 10) */}
-      <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-sm font-extrabold text-slate-900">My Placement Pipeline</h2>
-            <p className="text-xs text-slate-500">Track your verified journey from application to joining</p>
-          </div>
-          <span className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-2.5 py-1 rounded-full">
-            Active Candidates
-          </span>
-        </div>
-        <div className="grid grid-cols-5 gap-2 relative">
-          {[
-            { step: "1", label: "Applied", desc: "Submitted CV", state: "done" },
-            { step: "2", label: "Screened", desc: "HR Verified", state: "done" },
-            { step: "3", label: "Interview", desc: "Slot Confirmed", state: "active" },
-            { step: "4", label: "Offer", desc: "Letter Released", state: "pending" },
-            { step: "5", label: "Joined", desc: "Day 1 Onboarding", state: "pending" },
-          ].map((stage, i) => (
-            <div key={i} className="flex flex-col items-center text-center relative group">
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all ${
-                  stage.state === "done"
-                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                    : stage.state === "active"
-                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100 shadow-md shadow-indigo-600/30"
-                    : "bg-slate-100 text-slate-400 border border-slate-200"
-                }`}
-              >
-                {stage.state === "done" ? <Check className="w-4 h-4" /> : stage.step}
-              </div>
-              <span
-                className={`text-xs font-bold ${
-                  stage.state === "active"
-                    ? "text-indigo-600 font-extrabold"
-                    : stage.state === "done"
-                    ? "text-slate-900"
-                    : "text-slate-400"
-                }`}
-              >
-                {stage.label}
-              </span>
-              <span className="text-[10px] text-slate-400 hidden sm:block mt-0.5">{stage.desc}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Content grid — main + side, same pattern as employer/admin */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 space-y-6">
 
-      {/* Profile Completion Checklist */}
-      <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div>
-            <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Profile Completion &amp; Missing Items</span>
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Complete all items to get 3x more interview calls from top verified employers.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-              {completedList.length} of {checklist.length} Completed
-            </span>
-            <span
-              className={`text-xs font-extrabold px-2.5 py-1 rounded-full ${
-                pendingList.length === 0
-                  ? "bg-emerald-100 text-emerald-800"
-                  : "bg-blue-100 text-blue-800"
-              }`}
-            >
-              {completionScore}% Score
-            </span>
-          </div>
-        </div>
-
+        <ContentCard
+          title="Profile Completion & Missing Items"
+          subtitle="Complete all items to get 3x more interview calls from top verified employers."
+          actionHref="/candidate/profile"
+          actionLabel={`${completedList.length} of ${checklist.length} done`}
+        >
         {/* Pending Items Callout */}
         {pendingList.length > 0 ? (
           <div className="space-y-2 mb-4">
-            <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
               <span>Pending Action Items ({pendingList.length})</span>
             </div>
@@ -422,10 +364,10 @@ export default function CandidateOverviewPage() {
                 >
                   <div className="min-w-0 pr-2">
                     <span className="font-bold text-slate-900 block">{item.label}</span>
-                    <span className="text-[11px] text-slate-500 truncate block">{item.description}</span>
+                    <span className="text-xs text-slate-500 truncate block">{item.description}</span>
                   </div>
                   <Link href={item.actionHref}>
-                    <button className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors">
+                    <button className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-xs transition-colors">
                       {item.actionText}
                     </button>
                   </Link>
@@ -445,14 +387,14 @@ export default function CandidateOverviewPage() {
         {/* Completed items preview pills */}
         {completedList.length > 0 && (
           <div className="pt-3 border-t border-slate-100">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
               Verified &amp; Completed
             </span>
             <div className="flex flex-wrap gap-2">
               {completedList.map((item) => (
                 <div
                   key={item.key}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg"
+                  className="flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg"
                 >
                   <Check className="w-3 h-3 text-emerald-600 shrink-0" />
                   <span>{item.label}</span>
@@ -461,14 +403,14 @@ export default function CandidateOverviewPage() {
             </div>
           </div>
         )}
-      </section>
+        </ContentCard>
 
       {/* Quick Action Cards */}
-      <section>
-        <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide mb-3">
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <ContentCard
+        title="Quick Actions"
+        subtitle="Jump to the most-used candidate tools"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {actions.map((action) => (
             <Link
               key={action.label}
@@ -482,7 +424,7 @@ export default function CandidateOverviewPage() {
               </div>
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                 {action.label}
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
               </h3>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 {action.description}
@@ -490,34 +432,74 @@ export default function CandidateOverviewPage() {
             </Link>
           ))}
         </div>
-      </section>
+      </ContentCard>
 
-      {/* Recent Activity */}
-      <section>
-        <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide mb-3">
-          Recent Activity
-        </h2>
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <ul className="divide-y divide-slate-100">
-            {recentActivity.map((item, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50/60 transition-colors"
-              >
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                  {item.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 truncate">{item.text}</p>
-                </div>
-                <span className="text-[11px] text-slate-400 font-medium shrink-0">
-                  {item.time}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
-      </section>
+        <div className="lg:col-span-5 space-y-6">
+          <ContentCard
+            title="My Placement Pipeline"
+            subtitle="Application to joining journey"
+            actionHref="/candidate/applications"
+            actionLabel="Track"
+          >
+            <div className="grid grid-cols-5 gap-1">
+              {[
+                { step: "1", label: "Applied", state: "done" },
+                { step: "2", label: "Screened", state: "done" },
+                { step: "3", label: "Interview", state: "active" },
+                { step: "4", label: "Offer", state: "pending" },
+                { step: "5", label: "Joined", state: "pending" },
+              ].map((stage, i) => (
+                <div key={i} className="flex flex-col items-center text-center">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-1.5 transition-all ${
+                      stage.state === "done"
+                        ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
+                        : stage.state === "active"
+                        ? "bg-blue-600 text-white ring-4 ring-blue-100 shadow-md shadow-blue-600/30"
+                        : "bg-slate-100 text-slate-500 border border-slate-200"
+                    }`}
+                  >
+                    {stage.state === "done" ? <Check className="w-4 h-4" /> : stage.step}
+                  </div>
+                  <span
+                    className={`text-xs font-bold ${
+                      stage.state === "active"
+                        ? "text-blue-600 font-extrabold"
+                        : stage.state === "done"
+                        ? "text-slate-900"
+                        : "text-slate-500"
+                    }`}
+                  >
+                    {stage.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </ContentCard>
+
+          <ContentCard title="Recent Activity" actionHref="/candidate/applications" actionLabel="View All">
+            <ul className="divide-y divide-slate-100 -mx-1">
+              {recentActivity.map((item, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-3 px-2 py-3 hover:bg-slate-50/60 transition-colors rounded-xl"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{item.text}</p>
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium shrink-0">
+                    {item.time}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </ContentCard>
+        </div>
+      </div>
     </div>
   );
 }

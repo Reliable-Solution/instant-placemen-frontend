@@ -59,7 +59,7 @@ export const RoleSelectModal: React.FC<RoleSelectModalProps> = ({
             className="group relative bg-gradient-to-b from-indigo-50/50 to-white hover:from-indigo-50 hover:to-indigo-50/30 p-6 rounded-2xl border-2 border-indigo-200 hover:border-indigo-600 cursor-pointer transition-all duration-200 flex flex-col justify-between shadow-xs hover:shadow-lg hover:shadow-indigo-500/10"
           >
             <div className="absolute top-4 right-4">
-              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-xs font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Free
               </span>
             </div>
@@ -106,7 +106,7 @@ export const RoleSelectModal: React.FC<RoleSelectModalProps> = ({
             className="group relative bg-gradient-to-b from-slate-50 to-white hover:from-blue-50/50 hover:to-blue-50/20 p-6 rounded-2xl border-2 border-slate-200 hover:border-blue-600 cursor-pointer transition-all duration-200 flex flex-col justify-between shadow-xs hover:shadow-lg hover:shadow-blue-500/10"
           >
             <div className="absolute top-4 right-4">
-              <span className="text-[10px] font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-xs font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 For Recruiters
               </span>
             </div>

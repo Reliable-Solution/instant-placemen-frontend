@@ -251,7 +251,7 @@ export default function EmployerEditJobPage() {
         </button>
         <div className="text-right">
           <h1 className="text-lg font-extrabold text-slate-900">Edit Job Mandate</h1>
-          <p className="text-[11px] text-slate-500 truncate max-w-xs">{job.title}</p>
+          <p className="text-xs text-slate-500 truncate max-w-xs">{job.title}</p>
         </div>
       </div>
 
@@ -329,14 +329,14 @@ export default function EmployerEditJobPage() {
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Min Monthly Salary (₹) *</label>
               <div className="relative">
-                <span className="absolute left-3.5 top-3 text-slate-400 text-xs font-bold">₹</span>
+                <span className="absolute left-3.5 top-3 text-slate-500 text-xs font-bold">₹</span>
                 <Input type="number" min="0" step="500" required value={salaryMin} onChange={(e) => setSalaryMin(e.target.value === "" ? "" : Number(e.target.value))} className="h-11 pl-8 bg-slate-50 border-slate-200 text-xs rounded-xl focus:bg-white" />
               </div>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Max Monthly Salary (₹) *</label>
               <div className="relative">
-                <span className="absolute left-3.5 top-3 text-slate-400 text-xs font-bold">₹</span>
+                <span className="absolute left-3.5 top-3 text-slate-500 text-xs font-bold">₹</span>
                 <Input type="number" min="0" step="500" required value={salaryMax} onChange={(e) => setSalaryMax(e.target.value === "" ? "" : Number(e.target.value))} className="h-11 pl-8 bg-slate-50 border-slate-200 text-xs rounded-xl focus:bg-white" />
               </div>
             </div>
@@ -413,7 +413,7 @@ export default function EmployerEditJobPage() {
                     <button type="button" onClick={() => setSkillsRequired((p) => p.filter((s) => s !== sk))} className="hover:bg-violet-700 p-0.5 rounded-full"><X className="w-3 h-3" /></button>
                   </span>
                 ))}
-                {skillsRequired.length === 0 && <span className="text-xs text-slate-400 pl-1">No skills added yet.</span>}
+                {skillsRequired.length === 0 && <span className="text-xs text-slate-500 pl-1">No skills added yet.</span>}
               </div>
               <div className="flex gap-2">
                 <Input placeholder="Type skill & press Enter" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRequiredSkill(skillInput); } }} className="h-9 bg-slate-50 border-slate-200 text-xs rounded-xl" />
@@ -431,7 +431,7 @@ export default function EmployerEditJobPage() {
                     <button type="button" onClick={() => setPreferredSkills((p) => p.filter((s) => s !== sk))} className="hover:bg-slate-800 p-0.5 rounded-full"><X className="w-3 h-3" /></button>
                   </span>
                 ))}
-                {preferredSkills.length === 0 && <span className="text-xs text-slate-400 pl-1">No preferred skills added.</span>}
+                {preferredSkills.length === 0 && <span className="text-xs text-slate-500 pl-1">No preferred skills added.</span>}
               </div>
               <div className="flex gap-2">
                 <Input placeholder="Add preferred skill" value={preferredSkillInput} onChange={(e) => setPreferredSkillInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addPreferredSkill(preferredSkillInput); } }} className="h-9 bg-slate-50 border-slate-200 text-xs rounded-xl" />
@@ -515,7 +515,7 @@ export default function EmployerEditJobPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-900 text-white rounded-3xl shadow-xl">
           <div>
             <h4 className="text-sm font-bold">Save your changes</h4>
-            <p className="text-xs text-slate-400">Changes are reflected immediately for all candidates viewing this job.</p>
+            <p className="text-xs text-slate-500">Changes are reflected immediately for all candidates viewing this job.</p>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1 sm:flex-initial h-12 px-6 rounded-2xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border-white/20">

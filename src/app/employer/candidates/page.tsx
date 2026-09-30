@@ -27,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
-import DynamicPlanModal from "@/components/employer/DynamicPlanModal";
 
 export default function EmployerCandidateSearchPage() {
   const [jobFilter, setJobFilter] = useState("ALL");
@@ -35,7 +34,6 @@ export default function EmployerCandidateSearchPage() {
   const [expFilter, setExpFilter] = useState("ALL");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [planModalJob, setPlanModalJob] = useState<any | null>(null);
   const PAGE_SIZE = 9;
 
   const { data: jobs = [] } = useGetEmployerJobsQuery();
@@ -48,10 +46,6 @@ export default function EmployerCandidateSearchPage() {
   const applicantList = Array.isArray(applicants) ? applicants : (applicants as any).data || [];
   const totalApplicants = (applicants as any).total ?? applicantList.length;
   const totalPages = (applicants as any).totalPages ?? 1;
-
-  const handleOpenPlanModal = (app: any) => {
-    setPlanModalJob(app.job || { _id: app.jobId, title: app.job?.title || "Hiring Plan Mandate" });
-  };
 
   const openWhatsApp = (phone: string, name: string, jobTitle: string) => {
     const clean = phone.replace(/\D/g, "");
@@ -100,7 +94,7 @@ export default function EmployerCandidateSearchPage() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-300 block font-medium">Recruitment Tiers</span>
+              <span className="text-xs text-slate-300 block font-medium">Recruitment Tiers</span>
               <span className="text-sm font-black text-white">Module 1 / 2 / 3</span>
             </div>
           </div>
@@ -120,7 +114,7 @@ export default function EmployerCandidateSearchPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Keyword Search */}
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
             <Input
               placeholder="Search candidate name or skill..."
               value={searchQuery}
@@ -184,7 +178,7 @@ export default function EmployerCandidateSearchPage() {
       ) : filteredCandidates.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white border border-slate-200 rounded-3xl text-center gap-4">
           <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
-            <Users className="w-7 h-7 text-slate-400" />
+            <Users className="w-7 h-7 text-slate-500" />
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-sm">No candidate matches found</h3>
@@ -196,12 +190,11 @@ export default function EmployerCandidateSearchPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredCandidates.map((app: any) => {
-            const hasPurchasedPlan = Boolean(app.job?.purchasedPlan && app.job.purchasedPlan.paymentStatus === "PAID");
-            const rawPhone: string = app.candidatePhone || "";
-            const maskedPhone = rawPhone.length > 4
-              ? "+91 " + rawPhone.slice(0, 2) + "••••••" + rawPhone.slice(-2)
-              : "+91 ••••••••••";
-            const displayPhone = hasPurchasedPlan ? "+91 " + rawPhone : maskedPhone;
+            // Server pre-masks contacts without a paid plan (contactMasked flag).
+            const isContactUnlocked = app.contactMasked === false;
+            const rawPhone: string = app.candidatePhone || app.phone || "";
+            const maskedPhone = rawPhone || "+91 ••••••••••";
+            const displayPhone = isContactUnlocked ? "+91 " + rawPhone : maskedPhone;
 
             return (
               <div
@@ -211,18 +204,18 @@ export default function EmployerCandidateSearchPage() {
                 {/* Top Badge Row */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-extrabold border border-indigo-200">
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-extrabold border border-indigo-200">
                       94% Match
                     </span>
                     {app.commuteConfirmed && (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold border border-emerald-200 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold border border-emerald-200 flex items-center gap-1">
                         <CheckCircle2 className="w-2.5 h-2.5" />
                         <span>Commute Verified</span>
                       </span>
                     )}
                   </div>
                   <Badge
-                    className={`text-[10px] ${
+                    className={`text-xs ${
                       app.status === "SELECTED"
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : app.status === "REJECTED"
@@ -244,10 +237,10 @@ export default function EmployerCandidateSearchPage() {
                       {app.candidateName}
                     </h4>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-slate-400" />
+                      <MapPin className="w-3 h-3 text-slate-500" />
                       <span>{app.candidateCity || "Surat"}</span>
                       {app.commuteLocation && (
-                        <span className="text-slate-400 truncate">({app.commuteLocation})</span>
+                        <span className="text-slate-500 truncate">({app.commuteLocation})</span>
                       )}
                     </p>
                   </div>
@@ -261,11 +254,11 @@ export default function EmployerCandidateSearchPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-1.5">
-                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center gap-1">
-                      <GraduationCap className="w-3 h-3 text-slate-400" />
+                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium flex items-center gap-1">
+                      <GraduationCap className="w-3 h-3 text-slate-500" />
                       <span>{app.qualification || "12th Pass"}</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium">
+                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium">
                       {app.experience || "Fresher"}
                     </span>
                   </div>
@@ -273,7 +266,7 @@ export default function EmployerCandidateSearchPage() {
 
                 {/* Contact & Plan-Based Access Footer */}
                 <div className="pt-3 border-t border-slate-100">
-                  {hasPurchasedPlan ? (
+                  {isContactUnlocked ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono font-bold text-emerald-700">
                         <span className="flex items-center gap-1">
@@ -305,21 +298,20 @@ export default function EmployerCandidateSearchPage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                      <div className="flex items-center justify-between text-xs font-mono text-slate-500">
                         <span className="flex items-center gap-1">
                           <Lock className="w-3 h-3 text-amber-500" />
                           <span>Contact Masked</span>
                         </span>
                         <span>{maskedPhone}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleOpenPlanModal(app)}
-                        className="w-full h-9 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs gap-1.5 rounded-xl shadow-xs"
+                      <Link
+                        href="/employer/plans"
+                        className="w-full h-9 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs gap-1.5 rounded-xl shadow-xs inline-flex items-center justify-center"
                       >
                         <Lock className="w-3 h-3 text-amber-300" />
                         <span>Activate Hiring Plan to Unlock</span>
-                      </Button>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -343,16 +335,6 @@ export default function EmployerCandidateSearchPage() {
         />
       )}
 
-      {/* Plan Selection Modal */}
-      <DynamicPlanModal
-        isOpen={!!planModalJob}
-        onClose={() => setPlanModalJob(null)}
-        job={planModalJob}
-        onPlanActivated={() => {
-          refetch();
-          setPlanModalJob(null);
-        }}
-      />
     </div>
   );
 }

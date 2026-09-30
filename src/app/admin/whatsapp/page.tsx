@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
+import { TableSkeleton } from "@/components/Skeleton";
 import {
   MessageSquare,
   ShieldCheck,
@@ -202,8 +203,8 @@ export default function AdminWhatsAppSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-slate-500 font-medium">
-        Loading WhatsApp configuration...
+      <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
+        <TableSkeleton rows={4} />
       </div>
     );
   }
@@ -302,7 +303,7 @@ export default function AdminWhatsAppSettingsPage() {
               placeholder="https://instantbroadcast.in/api/v1/send_templet"
               className="font-mono text-xs"
             />
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Endpoint used by Instant Placement for WhatsApp dispatch.
             </p>
           </div>
@@ -322,12 +323,12 @@ export default function AdminWhatsAppSettingsPage() {
               <button
                 type="button"
                 onClick={() => setShowToken(!showToken)}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-600"
               >
                 {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Your instantbroadcast.in account JWT token.
             </p>
           </div>
@@ -360,7 +361,7 @@ export default function AdminWhatsAppSettingsPage() {
                 placeholder="instant_placement_login_otp_v2"
                 className="font-mono text-xs font-bold text-emerald-700"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Must match the approved template name on your WhatsApp Cloud API / instantbroadcast account.
               </p>
             </div>
@@ -377,14 +378,14 @@ export default function AdminWhatsAppSettingsPage() {
                     {"{{1}}"}
                   </span>
                   <span className="font-semibold text-slate-700">6-Digit OTP Code (Message Body)</span>
-                  <span className="text-slate-400 font-mono">e.g. 847291</span>
+                  <span className="text-slate-500 font-mono">e.g. 847291</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-200/60 pt-2">
                   <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {"{{2}}"}
                   </span>
                   <span className="font-semibold text-slate-700">Copy Code Button Payload</span>
-                  <span className="text-slate-400 font-mono">e.g. 847291</span>
+                  <span className="text-slate-500 font-mono">e.g. 847291</span>
                 </div>
               </div>
             </div>
@@ -395,17 +396,17 @@ export default function AdminWhatsAppSettingsPage() {
             <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
               <Send className="w-3.5 h-3.5 text-blue-600" /> Test Send OTP to Mobile
             </h4>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs text-slate-500">
               Send a real test OTP code right now to verify that your template name and token are valid.
             </p>
 
             <form onSubmit={handleTestOtp} className="space-y-3">
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-bold text-slate-700 block mb-1">
                   10-Digit Mobile Number
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">+91</span>
+                  <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-semibold">+91</span>
                   <Input
                     type="tel"
                     maxLength={10}
@@ -430,15 +431,15 @@ export default function AdminWhatsAppSettingsPage() {
             {/* Test result status */}
             {otpTestResult && (
               <div className={`p-3 rounded-xl text-xs border ${
-                otpTestResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-red-50 border-red-200 text-red-800"
+                otpTestResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
               }`}>
                 <div className="flex items-center gap-1.5 font-bold mb-1">
-                  {otpTestResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-red-600" />}
+                  {otpTestResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-rose-600" />}
                   <span>{otpTestResult.success ? "Success" : "Failed"}</span>
                 </div>
-                <p className="text-[11px] leading-relaxed">{otpTestResult.message}</p>
+                <p className="text-xs leading-relaxed">{otpTestResult.message}</p>
                 {otpTestResult.details?.messageId && (
-                  <p className="text-[10px] font-mono text-slate-500 mt-1">
+                  <p className="text-xs font-mono text-slate-500 mt-1">
                     Message ID: {otpTestResult.details.messageId}
                   </p>
                 )}
@@ -472,7 +473,7 @@ export default function AdminWhatsAppSettingsPage() {
             placeholder="candidate_profile_notification_v1"
             className="font-mono text-xs font-bold text-blue-700 max-w-md"
           />
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Meta approved utility template name for broadcasting new vacancies to matched candidates.
           </p>
         </div>
@@ -484,7 +485,7 @@ export default function AdminWhatsAppSettingsPage() {
               <h3 className="text-xs font-bold text-slate-900">
                 Template Positional Parameters Mapping ({"{{1}}"} to {"{{"}{jobAlertParams.length}{"}}"})
               </h3>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 These values are dynamically populated from candidate and job records in MongoDB.
               </p>
             </div>
@@ -494,7 +495,7 @@ export default function AdminWhatsAppSettingsPage() {
           </div>
 
           <div className="overflow-x-auto border border-slate-200 rounded-xl">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[800px] text-left text-xs">
               <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-2.5 px-3 w-16">Param</th>
@@ -518,7 +519,7 @@ export default function AdminWhatsAppSettingsPage() {
                         className="text-xs h-8"
                       />
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-slate-600 text-[11px]">
+                    <td className="py-2.5 px-3 font-mono text-slate-600 text-xs">
                       {param.key}
                     </td>
                     <td className="py-2.5 px-3">
@@ -542,11 +543,11 @@ export default function AdminWhatsAppSettingsPage() {
               <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                 <Send className="w-3.5 h-3.5 text-blue-600" /> Send Test Job Alert WhatsApp
               </h4>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Verify this template on your phone using custom or sample job alert parameters.
               </p>
             </div>
-            <Badge className="bg-blue-100 text-blue-800 border-none text-[10px]">
+            <Badge className="bg-blue-100 text-blue-800 border-none text-xs">
               Live WhatsApp Test
             </Badge>
           </div>
@@ -554,11 +555,11 @@ export default function AdminWhatsAppSettingsPage() {
           <form onSubmit={handleTestJobAlert} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Recipient WhatsApp Mobile <span className="text-red-500">*</span>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Recipient WhatsApp Mobile <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">+91</span>
+                  <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-semibold">+91</span>
                   <Input
                     type="tel"
                     maxLength={10}
@@ -572,7 +573,7 @@ export default function AdminWhatsAppSettingsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">{"{{1}}"} Candidate Name</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">{"{{1}}"} Candidate Name</label>
                 <Input
                   value={testName}
                   onChange={(e) => setTestName(e.target.value)}
@@ -581,7 +582,7 @@ export default function AdminWhatsAppSettingsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">{"{{2}}"} Job Role / Title</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">{"{{2}}"} Job Role / Title</label>
                 <Input
                   value={testRole}
                   onChange={(e) => setTestRole(e.target.value)}
@@ -590,7 +591,7 @@ export default function AdminWhatsAppSettingsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">{"{{3}}"} Company Name</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">{"{{3}}"} Company Name</label>
                 <Input
                   value={testCompany}
                   onChange={(e) => setTestCompany(e.target.value)}
@@ -599,7 +600,7 @@ export default function AdminWhatsAppSettingsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">{"{{4}}"} Job City</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">{"{{4}}"} Job City</label>
                 <Input
                   value={testCity}
                   onChange={(e) => setTestCity(e.target.value)}
@@ -608,7 +609,7 @@ export default function AdminWhatsAppSettingsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">{"{{5}}"} Salary Range</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">{"{{5}}"} Salary Range</label>
                 <Input
                   value={testSalary}
                   onChange={(e) => setTestSalary(e.target.value)}
@@ -618,7 +619,7 @@ export default function AdminWhatsAppSettingsPage() {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-slate-700 block mb-1">
                 {"{{6}}"} Button Job ID (Redirects candidate to /job/[id])
               </label>
               <Input
@@ -640,15 +641,15 @@ export default function AdminWhatsAppSettingsPage() {
           {/* Test Result status */}
           {jobAlertTestResult && (
             <div className={`p-4 rounded-xl text-xs border ${
-              jobAlertTestResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-red-50 border-red-200 text-red-800"
+              jobAlertTestResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
             }`}>
               <div className="flex items-center gap-1.5 font-bold mb-1">
-                {jobAlertTestResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-red-600" />}
+                {jobAlertTestResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-rose-600" />}
                 <span>{jobAlertTestResult.success ? "Delivered Successfully!" : "Dispatch Failed"}</span>
               </div>
-              <p className="text-[11px] leading-relaxed">{jobAlertTestResult.message}</p>
+              <p className="text-xs leading-relaxed">{jobAlertTestResult.message}</p>
               {jobAlertTestResult.details?.messageId && (
-                <p className="text-[10px] font-mono text-slate-500 mt-1">
+                <p className="text-xs font-mono text-slate-500 mt-1">
                   Message ID: {jobAlertTestResult.details.messageId}
                 </p>
               )}

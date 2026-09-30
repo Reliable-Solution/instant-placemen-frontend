@@ -7,7 +7,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ShieldCheck, Lock, Mail, Sparkles, ArrowRight, AlertCircle, Briefcase, ArrowLeft } from "lucide-react";
+import { Lock, Mail, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/config";
 
 
@@ -49,7 +49,11 @@ export default function AdminLoginPage() {
       const userData = data.data?.user || data.user;
       const token = data.data?.token || data.token;
 
-      if (userData.role !== "ADMIN") {
+      if (!userData || !token) {
+        throw new Error("Unexpected server response. Please try again.");
+      }
+
+      if (userData?.role !== "ADMIN") {
         throw new Error("Access denied. Your account is not configured as Super Administrator.");
       }
 
@@ -67,7 +71,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
       <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-8 shadow-xl relative overflow-hidden">
         {/* Glow Accent */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -82,17 +86,15 @@ export default function AdminLoginPage() {
 
         {/* Header */}
         <div className="text-center mb-6 relative">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-            <ShieldCheck className="w-7 h-7" />
-          </div>
+          <img src="/logo.png" alt="Instant Placement" className="h-11 w-auto object-contain mx-auto mb-3" />
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Super Admin Portal</h1>
           <p className="text-xs text-slate-500 mt-1">Instant Placement Master Management Console</p>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+          <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
         )}
@@ -102,14 +104,14 @@ export default function AdminLoginPage() {
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700">Admin Email</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="pl-10 h-11 bg-white border-slate-200 text-slate-900 text-xs placeholder:text-slate-400 focus:border-blue-600 rounded-xl"
-                placeholder="instantplacement.in@gmail.com"
+                className="pl-10 h-11 bg-white border-slate-200 text-slate-900 text-xs placeholder:text-slate-500 focus:border-blue-600 rounded-xl"
+                placeholder="admin@example.com"
               />
             </div>
           </div>
@@ -117,13 +119,13 @@ export default function AdminLoginPage() {
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700">Password</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="pl-10 h-11 bg-white border-slate-200 text-slate-900 text-xs placeholder:text-slate-400 focus:border-blue-600 rounded-xl"
+                className="pl-10 h-11 bg-white border-slate-200 text-slate-900 text-xs placeholder:text-slate-500 focus:border-blue-600 rounded-xl"
                 placeholder="••••••••"
               />
             </div>

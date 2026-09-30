@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DashboardHeader, StatCard, ContentCard } from "@/components/dashboard/Dashboard";
 
 export default function AdminDashboardPage() {
   const { data: stats, isLoading: statsLoading } = useGetAdminStatsQuery();
@@ -76,80 +77,51 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-              Platform Command Center
-            </span>
-            <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live System Active
-            </span>
+      <DashboardHeader
+        badge="Platform Command Center"
+        badgeColor="text-amber-700 bg-amber-50 border-amber-200"
+        title="Super Administrator Dashboard"
+        subtitle="Monitoring recruitment operations, client mandate turnaround times, and placement velocity."
+        live
+        extra={
+          <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-200 text-right shrink-0">
+            <span className="text-xs uppercase font-bold text-slate-500 block">Est. Platform Revenue</span>
+            <span className="text-xl font-extrabold text-emerald-600">{stats?.estimatedRevenue || "₹85,000"}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Super Administrator Dashboard
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Monitoring recruitment operations, client mandate turnaround times, and placement velocity.
-          </p>
-        </div>
-
-        <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-200 text-right shrink-0">
-          <span className="text-[10px] uppercase font-bold text-slate-500 block">Est. Platform Revenue</span>
-          <span className="text-xl font-extrabold text-emerald-600">{stats?.estimatedRevenue || "₹85,000"}</span>
-        </div>
-      </div>
+        }
+      />
 
       {/* 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card, i) => {
-          const Icon = card.icon;
-          return (
-            <Link
-              key={i}
-              href={card.link}
-              className="bg-white hover:bg-slate-50/70 border border-slate-200 hover:border-slate-300 rounded-3xl p-5 transition-all shadow-sm group"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2.5 rounded-2xl border shadow-sm ${card.color}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-              </div>
-              <p className="text-xs font-semibold text-slate-500">{card.title}</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1 tracking-tight">
-                {statsLoading ? "..." : card.value}
-              </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{card.total}</p>
-            </Link>
-          );
-        })}
+        {statCards.map((card, i) => (
+          <StatCard
+            key={i}
+            title={card.title}
+            value={statsLoading ? "..." : card.value}
+            sub={card.total}
+            icon={card.icon}
+            color={card.color}
+            href={card.link}
+          />
+        ))}
       </div>
 
       {/* Two Column Grid: Recent Applications & Recent Jobs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Recent Applications (ATS Preview) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <ContentCard
+          className="lg:col-span-7"
+          title="Live Applications Pipeline"
+          subtitle="Candidate submissions requiring screening review"
+          actionHref="/admin/applications"
+          actionLabel="View Full ATS"
+        >
           <div>
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900">Live Applications Pipeline</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Candidate submissions requiring screening review</p>
-              </div>
-              <Link href="/admin/applications">
-                <Button size="sm" variant="outline" className="text-xs h-8 rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold">
-                  View Full ATS
-                </Button>
-              </Link>
-            </div>
-
             <div className="space-y-3">
               {appsLoading ? (
-                <p className="text-xs text-slate-400 py-6 text-center">Loading applications...</p>
+                <p className="text-xs text-slate-500 py-6 text-center">Loading applications...</p>
               ) : applications.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center">No applications submitted yet.</p>
+                <p className="text-xs text-slate-500 py-6 text-center">No applications submitted yet.</p>
               ) : (
                 applications.slice(0, 5).map((app: any) => (
                   <div
@@ -159,10 +131,10 @@ export default function AdminDashboardPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs font-bold text-slate-900">{app.candidateName}</h4>
-                        <span className="text-[11px] text-slate-500 font-medium">({app.candidatePhone})</span>
+                        <span className="text-xs text-slate-500 font-medium">({app.candidatePhone})</span>
                       </div>
-                      <p className="text-[11px] text-blue-600 font-semibold mt-0.5">{app.jobTitle}</p>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-1">
+                      <p className="text-xs text-blue-600 font-semibold mt-0.5">{app.jobTitle}</p>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                         <span>{app.experience}</span>
                         <span>•</span>
                         <span>{app.qualification}</span>
@@ -175,7 +147,7 @@ export default function AdminDashboardPage() {
                       <select
                         value={app.status}
                         onChange={(e) => handleStageChange(app._id, e.target.value)}
-                        className="h-8 px-2.5 bg-white border border-slate-200 text-[11px] font-bold text-slate-800 rounded-xl focus:border-blue-500 shadow-sm"
+                        className="h-8 px-2.5 bg-white border border-slate-200 text-xs font-bold text-slate-800 rounded-xl focus:border-blue-500 shadow-sm"
                       >
                         <option value="NEW">NEW</option>
                         <option value="SCREENED">SCREENED</option>
@@ -191,28 +163,22 @@ export default function AdminDashboardPage() {
               )}
             </div>
           </div>
-        </div>
+        </ContentCard>
 
         {/* Live Active Jobs Preview */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <ContentCard
+          className="lg:col-span-5"
+          title="Active Job Mandates"
+          subtitle="Current requisitions on the portal"
+          actionHref="/admin/jobs"
+          actionLabel="Manage Jobs"
+        >
           <div>
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900">Active Job Mandates</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Current requisitions on the portal</p>
-              </div>
-              <Link href="/admin/jobs">
-                <Button size="sm" variant="outline" className="text-xs h-8 rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold">
-                  Manage Jobs
-                </Button>
-              </Link>
-            </div>
-
             <div className="space-y-3">
               {jobsLoading ? (
-                <p className="text-xs text-slate-400 py-6 text-center">Loading jobs...</p>
+                <p className="text-xs text-slate-500 py-6 text-center">Loading jobs...</p>
               ) : jobs.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center">No active jobs found.</p>
+                <p className="text-xs text-slate-500 py-6 text-center">No active jobs found.</p>
               ) : (
                 jobs.slice(0, 5).map((job: any) => (
                   <div
@@ -221,14 +187,14 @@ export default function AdminDashboardPage() {
                   >
                     <div className="overflow-hidden pr-2">
                       <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
-                      <p className="text-[11px] text-slate-500 truncate">{job.company} • {job.city}</p>
-                      <span className="text-[10px] text-emerald-600 font-bold">
+                      <p className="text-xs text-slate-500 truncate">{job.company} • {job.city}</p>
+                      <span className="text-xs text-emerald-600 font-bold">
                         ₹{(job.salaryMin / 1000).toFixed(0)}k - ₹{(job.salaryMax / 1000).toFixed(0)}k / mo
                       </span>
                     </div>
 
                     <Badge
-                      className={`text-[10px] shrink-0 ${
+                      className={`text-xs shrink-0 ${
                         job.status === "ACTIVE"
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-amber-50 text-amber-700 border-amber-200"
@@ -241,7 +207,7 @@ export default function AdminDashboardPage() {
               )}
             </div>
           </div>
-        </div>
+        </ContentCard>
       </div>
     </div>
   );

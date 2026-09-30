@@ -28,7 +28,7 @@ export const LivePlacementTicker: React.FC = () => {
     <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-blue-950 text-white py-2 px-4 border-b border-emerald-800/40 text-xs">
       <div className="container mx-auto max-w-6xl flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 overflow-hidden">
-          <span className="flex items-center gap-1 bg-emerald-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full shrink-0 animate-pulse">
+          <span className="flex items-center gap-1 bg-emerald-500 text-slate-950 font-extrabold text-xs px-2 py-0.5 rounded-full shrink-0 animate-pulse">
             <Zap className="w-3 h-3 fill-current" /> LIVE HIRING RADAR
           </span>
 
@@ -41,7 +41,7 @@ export const LivePlacementTicker: React.FC = () => {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-3 text-[11px] text-emerald-200 shrink-0">
+        <div className="hidden md:flex items-center gap-3 text-xs text-emerald-200 shrink-0">
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> 1,240 Placed Today
           </span>

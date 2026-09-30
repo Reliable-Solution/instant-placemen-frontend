@@ -65,7 +65,7 @@ export const FAQSection: React.FC = () => {
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${
+                    className={`w-4 h-4 text-slate-500 transition-transform duration-200 shrink-0 ${
                       isOpen ? "rotate-180 text-blue-600" : ""
                     }`}
                   />

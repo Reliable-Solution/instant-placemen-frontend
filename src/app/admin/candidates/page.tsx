@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
 import { CandidateDetailModal } from "@/components/admin/CandidateDetailModal";
+import { ListSkeleton } from "@/components/Skeleton";
 
 export default function AdminCandidatesPage() {
   const [search, setSearch] = useState("");
@@ -56,13 +57,13 @@ export default function AdminCandidatesPage() {
       {/* Filter Bar */}
       <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
           <Input
             type="text"
             placeholder="Search candidate by name, skill, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 h-10 bg-slate-50 border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 rounded-xl"
+            className="pl-10 h-10 bg-slate-50 border-slate-200 text-xs text-slate-900 placeholder:text-slate-500 rounded-xl"
           />
         </div>
 
@@ -89,11 +90,11 @@ export default function AdminCandidatesPage() {
       {/* Candidate Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading ? (
-          <div className="col-span-full p-12 text-center text-xs text-slate-400">
-            Loading candidate database...
+          <div className="col-span-full">
+            <ListSkeleton items={6} />
           </div>
         ) : candidates.length === 0 ? (
-          <div className="col-span-full p-12 text-center text-xs text-slate-400">
+          <div className="col-span-full p-12 text-center text-xs text-slate-500">
             No candidates match the filter criteria.
           </div>
         ) : (
@@ -123,33 +124,33 @@ export default function AdminCandidatesPage() {
                         <BadgeCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                       </h4>
                       <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                        <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
                         <span>{c.locality ? `${c.locality}, ` : ""}{c.city || "Surat"}</span>
                       </div>
                     </div>
                   </div>
 
-                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] shrink-0">
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs shrink-0">
                     Immediate
                   </Badge>
                 </div>
 
                 <div className="pt-1 text-xs text-slate-700 space-y-1">
-                  <div className="flex items-center gap-2 text-slate-500 text-[11px]">
+                  <div className="flex items-center gap-2 text-slate-500 text-xs">
                     <span className="font-semibold text-blue-600">{c.experience || "Fresher"}</span>
                     <span>•</span>
                     <span className="truncate">{c.qualification || "12th Pass"}</span>
                   </div>
 
                   {c.currentCompany && (
-                    <div className="text-[11px] text-slate-600 flex items-center gap-1 truncate font-medium">
+                    <div className="text-xs text-slate-600 flex items-center gap-1 truncate font-medium">
                       <span>🏢</span>
                       <span className="truncate">{c.currentCompany}</span>
                     </div>
                   )}
 
                   {c.resumeSummary && (
-                    <p className="text-[11px] text-slate-500 italic line-clamp-2 mt-1">
+                    <p className="text-xs text-slate-500 italic line-clamp-2 mt-1">
                       "{c.resumeSummary}"
                     </p>
                   )}
@@ -161,13 +162,13 @@ export default function AdminCandidatesPage() {
                     {c.skills.slice(0, 4).map((skill: string, idx: number) => (
                       <span
                         key={idx}
-                        className="text-[10px] bg-slate-50 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200 font-medium"
+                        className="text-xs bg-slate-50 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200 font-medium"
                       >
                         {skill}
                       </span>
                     ))}
                     {c.skills.length > 4 && (
-                      <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-md border border-blue-200 font-bold">
+                      <span className="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-md border border-blue-200 font-bold">
                         +{c.skills.length - 4} more
                       </span>
                     )}

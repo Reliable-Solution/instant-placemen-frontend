@@ -95,7 +95,13 @@ function EmployerLoginContent() {
       const userData = data.data?.user || data.user;
       const token = data.data?.token || data.token;
 
-      if (userData.role !== "EMPLOYER" && userData.role !== "ADMIN") {
+      if (!userData || !token) {
+        const msg = "Unexpected server response. Please try again.";
+        toast.error(msg);
+        throw new Error(msg);
+      }
+
+      if (userData?.role !== "EMPLOYER" && userData?.role !== "ADMIN") {
         const msg = "This portal is reserved for Job Providers & Employers.";
         toast.error(msg);
         throw new Error(msg);
@@ -112,7 +118,7 @@ function EmployerLoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
       <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-8 shadow-xl relative overflow-hidden">
         {/* Glow Accent */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -127,9 +133,7 @@ function EmployerLoginContent() {
 
         {/* Header */}
         <div className="text-center mb-6 relative">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-            <Building2 className="w-7 h-7" />
-          </div>
+          <img src="/logo.png" alt="Instant Placement" className="h-11 w-auto object-contain mx-auto mb-3" />
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Job Provider Portal</h1>
           <p className="text-xs text-slate-500 mt-1">Hire verified staff within 48 to 72 hours</p>
         </div>
@@ -162,8 +166,8 @@ function EmployerLoginContent() {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+          <div className="mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
         )}
@@ -175,7 +179,7 @@ function EmployerLoginContent() {
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Company Name</label>
                 <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Building2 className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                   <Input
                     type="text"
                     required
@@ -218,7 +222,7 @@ function EmployerLoginContent() {
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Work Email</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <Input
                 type="email"
                 required
@@ -234,14 +238,14 @@ function EmployerLoginContent() {
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700">Password</label>
               {mode === "register" && (
-                <span className={`text-[11px] font-semibold flex items-center gap-1 ${password.length >= 6 ? "text-emerald-600" : "text-slate-400"}`}>
+                <span className={`text-xs font-semibold flex items-center gap-1 ${password.length >= 6 ? "text-emerald-600" : "text-slate-500"}`}>
                   <CheckCircle2 className={`w-3 h-3 ${password.length >= 6 ? "text-emerald-500" : "text-slate-300"}`} />
                   <span>Min. 6 characters</span>
                 </span>
               )}
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <Input
                 type={showPassword ? "text" : "password"}
                 required
@@ -253,14 +257,14 @@ function EmployerLoginContent() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-600 transition-colors"
                 title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {mode === "register" && (
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Password must be at least 6 characters (e.g. MyCompany123)
               </p>
             )}
@@ -284,10 +288,10 @@ export default function EmployerLoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-xs text-slate-500 font-medium">Loading...</p>
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-xs text-blue-100 font-medium">Loading...</p>
           </div>
         </div>
       }

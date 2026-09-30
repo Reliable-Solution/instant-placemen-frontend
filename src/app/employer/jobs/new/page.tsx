@@ -388,7 +388,7 @@ export default function EmployerPostJobPage() {
                     ? "bg-indigo-50 border border-indigo-200 text-indigo-950 font-bold shadow-xs"
                     : isCompleted
                     ? "bg-emerald-50/60 border border-emerald-100 text-slate-800 hover:bg-emerald-50"
-                    : "bg-slate-50 border border-slate-100 text-slate-400 hover:bg-slate-100"
+                    : "bg-slate-50 border border-slate-100 text-slate-500 hover:bg-slate-100"
                 }`}
               >
                 <div
@@ -404,7 +404,7 @@ export default function EmployerPostJobPage() {
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs truncate font-bold leading-tight">{step.title}</div>
-                  <div className="text-[10px] text-slate-400 truncate hidden sm:block">
+                  <div className="text-xs text-slate-500 truncate hidden sm:block">
                     {step.desc}
                   </div>
                 </div>
@@ -789,7 +789,7 @@ export default function EmployerPostJobPage() {
                         </span>
                       ))}
                       {skillsRequired.length === 0 && (
-                        <span className="text-xs text-slate-400 pl-1">No skills added yet.</span>
+                        <span className="text-xs text-slate-500 pl-1">No skills added yet.</span>
                       )}
                     </div>
 
@@ -977,27 +977,27 @@ export default function EmployerPostJobPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Role Title</span>
+                      <span className="text-slate-500 block text-xs">Role Title</span>
                       <span className="font-bold text-slate-900">{title || "Not specified"}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Category</span>
+                      <span className="text-slate-500 block text-xs">Category</span>
                       <span className="font-bold text-slate-900">{category}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Salary Range</span>
+                      <span className="text-slate-500 block text-xs">Salary Range</span>
                       <span className="font-bold text-emerald-700">₹{Number(salaryMin).toLocaleString()} - ₹{Number(salaryMax).toLocaleString()} /mo</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Location</span>
+                      <span className="text-slate-500 block text-xs">Location</span>
                       <span className="font-bold text-slate-900">{city} {locality ? `(${locality})` : ""}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Open Vacancies</span>
+                      <span className="text-slate-500 block text-xs">Open Vacancies</span>
                       <span className="font-bold text-indigo-700">{vacancies} Openings</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Recruiter Contact</span>
+                      <span className="text-slate-500 block text-xs">Recruiter Contact</span>
                       <span className="font-bold text-slate-900">{recruiterName} (+91 {whatsappNumber})</span>
                     </div>
                   </div>
@@ -1006,7 +1006,7 @@ export default function EmployerPostJobPage() {
                     <Zap className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold">Instant Placement Verification Notice</p>
-                      <p className="text-[11px] text-amber-800 mt-0.5">
+                      <p className="text-xs text-amber-800 mt-0.5">
                         Your listing will receive the "Instant Verified Employer" badge and will be immediately eligible for tele-screening by our AI matching engine.
                       </p>
                     </div>
@@ -1065,7 +1065,7 @@ export default function EmployerPostJobPage() {
               <Eye className="w-3.5 h-3.5 text-indigo-600" />
               <span>Candidate View Preview</span>
             </span>
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               Auto-updating
             </span>
           </div>
@@ -1085,9 +1085,9 @@ export default function EmployerPostJobPage() {
                     {title || "Job Designation Title"}
                   </h3>
                   <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                    <Building2 className="w-3 h-3 text-slate-400" />
+                    <Building2 className="w-3 h-3 text-slate-500" />
                     <span>{user?.companyName || "Your Company Name"}</span>
-                    <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded font-bold border border-emerald-200 ml-1">
+                    <span className="inline-flex items-center gap-0.5 text-xs text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded font-bold border border-emerald-200 ml-1">
                       <ShieldCheck className="w-2.5 h-2.5" />
                       <span>Verified</span>
                     </span>
@@ -1097,7 +1097,7 @@ export default function EmployerPostJobPage() {
             </div>
 
             {/* Badges row */}
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold border border-indigo-200/60">
                 {category}
               </span>
@@ -1112,9 +1112,9 @@ export default function EmployerPostJobPage() {
             {/* Location & Salary Highlights */}
             <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-100 text-xs">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
                 <div className="truncate">
-                  <span className="text-[10px] text-slate-400 block leading-tight">Location</span>
+                  <span className="text-xs text-slate-500 block leading-tight">Location</span>
                   <span className="font-bold text-slate-800 truncate block">
                     {city || "City"} {locality ? `· ${locality}` : ""}
                   </span>
@@ -1124,7 +1124,7 @@ export default function EmployerPostJobPage() {
               <div className="flex items-center gap-2">
                 <IndianRupee className="w-4 h-4 text-emerald-600 shrink-0" />
                 <div>
-                  <span className="text-[10px] text-slate-400 block leading-tight">Monthly In-Hand</span>
+                  <span className="text-xs text-slate-500 block leading-tight">Monthly In-Hand</span>
                   <span className="font-bold text-emerald-700">
                     ₹{salaryMin ? Number(salaryMin).toLocaleString() : "0"} - ₹{salaryMax ? Number(salaryMax).toLocaleString() : "0"}
                   </span>
@@ -1134,20 +1134,20 @@ export default function EmployerPostJobPage() {
 
             {/* Required Skills tags preview */}
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1.5">
+              <span className="text-xs uppercase font-bold tracking-wider text-slate-500 block mb-1.5">
                 Key Required Skills
               </span>
               <div className="flex flex-wrap gap-1">
                 {skillsRequired.slice(0, 4).map((sk) => (
                   <span
                     key={sk}
-                    className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 text-[11px] font-semibold border border-violet-200/60"
+                    className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 text-xs font-semibold border border-violet-200/60"
                   >
                     {sk}
                   </span>
                 ))}
                 {skillsRequired.length > 4 && (
-                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[11px] font-medium">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-xs font-medium">
                     +{skillsRequired.length - 4} more
                   </span>
                 )}
@@ -1157,20 +1157,20 @@ export default function EmployerPostJobPage() {
             {/* Perks & Benefits preview */}
             {selectedBenefits.length > 0 && (
               <div className="border-t border-slate-100 pt-2.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1.5">
+                <span className="text-xs uppercase font-bold tracking-wider text-slate-500 block mb-1.5">
                   Perks & Benefits
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {selectedBenefits.slice(0, 3).map((b) => (
                     <span
                       key={b}
-                      className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-medium border border-emerald-200/60"
+                      className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200/60"
                     >
                       ✓ {b}
                     </span>
                   ))}
                   {selectedBenefits.length > 3 && (
-                    <span className="text-[10px] text-slate-400 self-center">
+                    <span className="text-xs text-slate-500 self-center">
                       +{selectedBenefits.length - 3} more
                     </span>
                   )}
@@ -1189,7 +1189,7 @@ export default function EmployerPostJobPage() {
               </div>
             </div>
 
-            <div className="text-[10px] text-center text-slate-400 pt-1">
+            <div className="text-xs text-center text-slate-500 pt-1">
               Recruiter: {recruiterName || "Talent Desk"} · {vacancies || 1} Openings
             </div>
           </div>

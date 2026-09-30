@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loadUserFromStorage, logout } from "@/store/slices/authSlice";
+import { loadUserFromStorage, logout, verifyRoleFromToken } from "@/store/slices/authSlice";
 import { useGetEmployerProfileQuery } from "@/services/api/employerApi";
 import {
   LayoutDashboard,
@@ -30,6 +30,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   const { user } = useAppSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [validated, setValidated] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -43,10 +44,27 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   const displayCompanyName = profile?.companyName || user?.companyName;
   const displayName = profile?.name || user?.name;
 
+  const getActivePlanDisplay = () => {
+    let text = profile?.activePlanText;
+    if (typeof text === "string" && text.trim()) {
+      text = text
+        .replace(/\/ ?\[object Object\]/gi, "")
+        .replace(/\[object Object\] ?\/?/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (text && !text.includes("[object") && !text.includes("{")) {
+        if (text.toLowerCase() === "no active plan") return "No Active Plan";
+        return text.endsWith("Active") ? text : `${text} Active`;
+      }
+    }
+    return "No Active Plan";
+  };
+
   useEffect(() => {
     if (mounted && !isLoginPage) {
       const savedUserStr = localStorage.getItem("ip_user");
-      if (!savedUserStr) {
+      const savedToken = localStorage.getItem("ip_token");
+      if (!savedUserStr || !savedToken) {
         router.push("/employer/login");
         return;
       }
@@ -57,6 +75,15 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           router.push("/employer/login?role_mismatch=true");
           return;
         }
+        const tokenOk =
+          verifyRoleFromToken(savedToken, "EMPLOYER") ||
+          verifyRoleFromToken(savedToken, "ADMIN");
+        if (!tokenOk) {
+          // Token missing, expired, or role mismatch — force re-login
+          router.push("/employer/login");
+          return;
+        }
+        setValidated(true);
       } catch {
         router.push("/employer/login");
       }
@@ -64,7 +91,26 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   }, [mounted, isLoginPage, router]);
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-50 text-slate-900">{children}</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+          Skip to main content
+        </a>
+        <main id="main-content">{children}</main>
+      </div>
+    );
+  }
+
+  // Gate render until token + role validated (don't render children if invalid)
+  if (!mounted || !validated) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-600 text-sm font-medium">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   const navItems = [
@@ -83,16 +129,19 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+        Skip to main content
+      </a>
       {/* Mobile Topbar: Sticky at the top */}
-      <header className="md:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
+      <header className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
         <Link href="/" className="flex items-center gap-2">
           <img
             src="/logo.png"
             alt="Instant Placement"
             className="h-10 w-auto max-w-[190px] object-contain"
           />
-          <span className="text-[10px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+          <span className="text-xs text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
             Employer
           </span>
         </Link>
@@ -124,7 +173,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                   alt="Instant Placement"
                   className="h-10 w-auto max-w-[190px] object-contain"
                 />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1 py-0.5 rounded border border-blue-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1 py-0.5 rounded border border-blue-200">
                   Employer
                 </span>
               </Link>
@@ -154,7 +203,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                   <span>{displayCompanyName || "Your Company"}</span>
                   <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 </p>
-                <p className="text-[11px] text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
+                <p className="text-xs text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
               </div>
             </div>
 
@@ -206,7 +255,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
       )}
 
       {/* Desktop Sidebar: Locked permanently to the left viewport, never scrolls with page data */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white border-r border-slate-200 shadow-xs">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white dark:bg-slate-900 border-r border-slate-200 shadow-xs">
         <div className="flex flex-col flex-1 h-full min-h-0">
           {/* Brand Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -217,7 +266,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                 className="h-10 w-auto max-w-[190px] object-contain"
               />
             </Link>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
               Employer
             </span>
           </div>
@@ -240,7 +289,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                 <span>{displayCompanyName || "Your Company"}</span>
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               </p>
-              <p className="text-[11px] text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
+              <p className="text-xs text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
             </div>
           </div>
 
@@ -273,16 +322,16 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           <div className="mx-3 mb-2 p-3 bg-gradient-to-br from-indigo-50/90 to-purple-50/60 rounded-2xl border border-indigo-200/80 shrink-0">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase font-extrabold text-indigo-600 tracking-wider block">
+                <span className="text-xs uppercase font-extrabold text-indigo-600 tracking-wider block">
                   Hiring Plan Tier
                 </span>
                 <span className="text-xs font-black text-indigo-950">
-                  {profile?.activePlanText || (profile as any)?.activePlan || "Module 1 Active"}
+                  {getActivePlanDisplay()}
                 </span>
               </div>
               <Link
                 href="/employer/plans"
-                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] rounded-lg shadow-2xs transition-colors"
+                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-2xs transition-colors"
               >
                 View Plans
               </Link>
@@ -310,8 +359,8 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
       </aside>
 
       {/* Main Content Area: Offset by sidebar width (md:pl-64), scrolls naturally without dragging sidebar */}
-      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 pb-20 md:pb-8">
-        <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto min-w-0">
+      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 md:pb-8">
+        <main id="main-content" className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl xl:max-w-[1600px] w-full mx-auto min-w-0">
           {children}
         </main>
       </div>
@@ -321,21 +370,21 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
         <Link
           href="/employer"
           className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
-            pathname === "/employer" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+            pathname === "/employer" ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-800"
           }`}
         >
-          <LayoutDashboard className={`w-5 h-5 ${pathname === "/employer" ? "text-indigo-600" : "text-slate-400"}`} />
-          <span className="text-[10px] mt-0.5 tracking-tight">Overview</span>
+          <LayoutDashboard className={`w-5 h-5 ${pathname === "/employer" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-xs mt-0.5 tracking-tight">Overview</span>
         </Link>
 
         <Link
           href="/employer/jobs"
           className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
-            pathname === "/employer/jobs" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+            pathname === "/employer/jobs" ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-800"
           }`}
         >
-          <Briefcase className={`w-5 h-5 ${pathname === "/employer/jobs" ? "text-indigo-600" : "text-slate-400"}`} />
-          <span className="text-[10px] mt-0.5 tracking-tight">My Jobs</span>
+          <Briefcase className={`w-5 h-5 ${pathname === "/employer/jobs" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-xs mt-0.5 tracking-tight">My Jobs</span>
         </Link>
 
         {/* Elevated Center FAB: Post Job */}
@@ -346,27 +395,27 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-600/35 border-2 border-white group-active:scale-95 transition-all">
             <PlusCircle className="w-6 h-6" />
           </div>
-          <span className="text-[10px] font-bold text-indigo-700 mt-1">Post Job</span>
+          <span className="text-xs font-bold text-indigo-700 mt-1">Post Job</span>
         </Link>
 
         <Link
           href="/employer/candidates"
           className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
-            pathname === "/employer/candidates" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+            pathname === "/employer/candidates" ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-800"
           }`}
         >
-          <Users className={`w-5 h-5 ${pathname === "/employer/candidates" ? "text-indigo-600" : "text-slate-400"}`} />
-          <span className="text-[10px] mt-0.5 tracking-tight">Candidates</span>
+          <Users className={`w-5 h-5 ${pathname === "/employer/candidates" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-xs mt-0.5 tracking-tight">Candidates</span>
         </Link>
 
         <Link
           href="/employer/plans"
           className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all ${
-            pathname === "/employer/plans" ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+            pathname === "/employer/plans" ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-800"
           }`}
         >
-          <CreditCard className={`w-5 h-5 ${pathname === "/employer/plans" ? "text-indigo-600" : "text-slate-400"}`} />
-          <span className="text-[10px] mt-0.5 tracking-tight">Billing</span>
+          <CreditCard className={`w-5 h-5 ${pathname === "/employer/plans" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-xs mt-0.5 tracking-tight">Billing</span>
         </Link>
       </nav>
     </div>

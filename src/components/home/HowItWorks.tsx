@@ -79,7 +79,7 @@ export const HowItWorks: React.FC = () => {
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>100% Free Guarantee</span>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Direct HR</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Direct HR</span>
                 </div>
               </div>
             );

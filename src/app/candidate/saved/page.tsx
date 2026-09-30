@@ -171,13 +171,13 @@ export default function CandidateSavedJobsPage() {
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-1.5">
                     {job.matchScore && (
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1">
                         <Sparkles className="w-3 h-3 text-purple-600" />
                         {job.matchScore}% match
                       </span>
                     )}
                     {job.isUrgent && (
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1">
                         <Zap className="w-3 h-3 text-amber-600" />
                         Urgent
                       </span>
@@ -186,7 +186,7 @@ export default function CandidateSavedJobsPage() {
                   <button
                     onClick={() => handleRemove(job.id)}
                     title="Remove from saved"
-                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -204,7 +204,7 @@ export default function CandidateSavedJobsPage() {
                     <p className="text-xs text-slate-600 font-semibold truncate mt-0.5">
                       {job.company}
                     </p>
-                    <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
                       <span>{job.locality ? `${job.locality}, ` : ""}{job.city}</span>
                     </p>
@@ -213,7 +213,7 @@ export default function CandidateSavedJobsPage() {
 
                 {/* Salary Info */}
                 <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 mb-4 flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                  <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
                     Offered Salary
                   </span>
                   <span className="text-xs font-black text-slate-900">

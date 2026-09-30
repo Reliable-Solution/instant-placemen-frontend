@@ -92,7 +92,7 @@ export default function AdminFAQsPage() {
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-4 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-900">New FAQ</h3>
-            <button onClick={cancelEdit} className="text-slate-400 hover:text-slate-600">
+            <button onClick={cancelEdit} className="text-slate-500 hover:text-slate-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -146,9 +146,9 @@ export default function AdminFAQsPage() {
 
       {/* FAQ List */}
       {isLoading ? (
-        <div className="text-center py-10 text-slate-400">Loading...</div>
+        <div className="text-center py-10 text-slate-500">Loading...</div>
       ) : faqs.length === 0 ? (
-        <div className="text-center py-10 text-slate-400">No FAQs yet. Add your first FAQ.</div>
+        <div className="text-center py-10 text-slate-500">No FAQs yet. Add your first FAQ.</div>
       ) : (
         <div className="space-y-3">
           {faqs.map((faq) => (
@@ -208,12 +208,12 @@ export default function AdminFAQsPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
                         faq.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
                       }`}>
                         {faq.isActive ? "ACTIVE" : "INACTIVE"}
                       </span>
-                      <span className="text-[10px] text-slate-400">Order: {faq.order}</span>
+                      <span className="text-xs text-slate-500">Order: {faq.order}</span>
                     </div>
                     <h4 className="font-bold text-sm text-slate-900 mb-1">{faq.question}</h4>
                     <p className="text-xs text-slate-500 line-clamp-2">{faq.answer}</p>
@@ -221,13 +221,13 @@ export default function AdminFAQsPage() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => startEdit(faq)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                      className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(faq._id)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
+                      className="p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

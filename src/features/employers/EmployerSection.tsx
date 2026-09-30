@@ -258,7 +258,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       }`}
     >
       {highlighted && (
-        <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-[11px] font-semibold text-white">
+        <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
           <Sparkles className="h-3 w-3 fill-current text-amber-300" />
           Most popular
         </span>
@@ -267,7 +267,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       {/* Header row */}
       <div className="mb-4 flex items-center justify-between">
         <span
-          className={`rounded-md border px-2.5 py-1 text-[11px] font-semibold ${badgeClasses}`}
+          className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${badgeClasses}`}
         >
           {badge}
         </span>
@@ -303,7 +303,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
             ) : (
               <X className="mt-0.5 h-4 w-4 shrink-0 text-slate-300" />
             )}
-            <span className={f.included ? (f.strong ? "font-semibold" : "") : "text-slate-400"}>
+            <span className={f.included ? (f.strong ? "font-semibold" : "") : "text-slate-500"}>
               {f.text}
             </span>
           </li>

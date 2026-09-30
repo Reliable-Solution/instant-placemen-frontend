@@ -61,9 +61,13 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
   const SERVER_BASE = API_BASE.replace("/api/v1", "");
 
   const hasResume = Boolean(candidate.resumeUrl);
-  const resumeUrl = candidate.resumeUrl?.startsWith("http")
+  const token = typeof window !== "undefined" ? localStorage.getItem("ip_token") : "";
+  const rawResumeUrl = candidate.resumeUrl?.startsWith("http")
     ? candidate.resumeUrl
-    : `${SERVER_BASE}${candidate.resumeUrl}`;
+    : (candidate.resumeUrl ? `${SERVER_BASE}${candidate.resumeUrl}` : "");
+  const resumeUrl = token && rawResumeUrl
+    ? `${rawResumeUrl}${rawResumeUrl.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
+    : rawResumeUrl;
   
   const resumeDisplayName = candidate.resumeFile || candidate.resumeUrl?.split("/").pop() || "Resume.pdf";
 
@@ -113,12 +117,12 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                   <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" />
                 </h2>
                 {candidate.isImmediateJoiner !== false && (
-                  <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold rounded-full">
+                  <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-full">
                     Immediate Joiner
                   </span>
                 )}
                 {candidate.consentToShareProfile && (
-                  <span className="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold rounded-full flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold rounded-full flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3" /> Consent Verified
                   </span>
                 )}
@@ -181,7 +185,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                   {/* Job Picker Dropdown */}
                   {showJobPicker && (
                     <div className="absolute left-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                         Select a Job to Notify
                       </p>
                       <select
@@ -238,14 +242,14 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
             className={`px-5 py-2.5 text-xs font-bold flex items-center gap-2 shrink-0 ${
               alertStatus.type === "success"
                 ? "bg-emerald-50 text-emerald-800 border-b border-emerald-200"
-                : "bg-red-50 text-red-800 border-b border-red-200"
+                : "bg-rose-50 text-rose-800 border-b border-rose-200"
             }`}
           >
             {alertStatus.type === "success" ? "✅" : "❌"} {alertStatus.msg}
             <button
               type="button"
               onClick={() => setAlertStatus(null)}
-              className="ml-auto text-slate-400 hover:text-slate-600"
+              className="ml-auto text-slate-500 hover:text-slate-600"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -305,7 +309,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Contact: Phone */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Mobile Number
                   </span>
                   <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -316,7 +320,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Contact: WhatsApp */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     WhatsApp Number
                   </span>
                   <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -327,7 +331,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Contact: Email */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Email Address
                   </span>
                   <div className="font-bold text-xs text-slate-900 truncate flex items-center gap-2" title={candidate.email}>
@@ -338,7 +342,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Target Role */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Target Role / Designation
                   </span>
                   <div className="font-extrabold text-sm text-blue-700 flex items-center gap-2">
@@ -349,7 +353,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Current Company */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Current / Recent Company
                   </span>
                   <div className="font-bold text-sm text-slate-800 flex items-center gap-2">
@@ -360,7 +364,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Experience Tier */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Experience Level
                   </span>
                   <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -374,7 +378,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Education */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Highest Qualification
                   </span>
                   <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -385,7 +389,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* City & Locality */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     City &amp; Area / Locality
                   </span>
                   <div className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -396,7 +400,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Expected Salary */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Expected Monthly Salary
                   </span>
                   <div className="font-extrabold text-sm text-emerald-700 flex items-center gap-1.5">
@@ -411,7 +415,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Notice Period */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Notice Period
                   </span>
                   <span className="font-bold text-sm text-slate-800">
@@ -421,7 +425,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Willing to Relocate */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Relocation Willingness
                   </span>
                   <span className="font-bold text-sm text-slate-800">
@@ -431,7 +435,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
 
                 {/* Registration Date */}
                 <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Member Since
                   </span>
                   <span className="font-bold text-sm text-slate-800">
@@ -443,7 +447,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
               {/* Detailed Qualification Note if present */}
               {candidate.qualificationDetail && (
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Academic Background &amp; Degree Information
                   </span>
                   <p className="text-xs font-semibold text-slate-800">
@@ -473,7 +477,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400">No skills added yet.</p>
+                  <p className="text-xs text-slate-500">No skills added yet.</p>
                 )}
               </div>
 
@@ -484,7 +488,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     <ShieldCheck className="w-4 h-4 text-indigo-600" />
                     <span>Recruiter Tele-Screening Verification</span>
                   </h3>
-                  <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
                     360° Dossier
                   </span>
                 </div>
@@ -494,7 +498,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
                     <div>
                       <span className="font-bold text-slate-900 block leading-tight">Hindi &amp; Regional Fluency</span>
-                      <span className="text-[10px] text-slate-500">Candidate demonstrates clear telephone communication</span>
+                      <span className="text-xs text-slate-500">Candidate demonstrates clear telephone communication</span>
                     </div>
                   </label>
 
@@ -502,7 +506,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
                     <div>
                       <span className="font-bold text-slate-900 block leading-tight">Notice Period: Immediate</span>
-                      <span className="text-[10px] text-slate-500">Available to join within 0-3 business days</span>
+                      <span className="text-xs text-slate-500">Available to join within 0-3 business days</span>
                     </div>
                   </label>
 
@@ -510,7 +514,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
                     <div>
                       <span className="font-bold text-slate-900 block leading-tight">Salary Expectations Aligned</span>
-                      <span className="text-[10px] text-slate-500">Fits within budget of target job openings</span>
+                      <span className="text-xs text-slate-500">Fits within budget of target job openings</span>
                     </div>
                   </label>
 
@@ -518,7 +522,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                     <input type="checkbox" defaultChecked className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
                     <div>
                       <span className="font-bold text-slate-900 block leading-tight">Commute Feasibility Verified</span>
-                      <span className="text-[10px] text-slate-500">Within manageable travel radius of job locations</span>
+                      <span className="text-xs text-slate-500">Within manageable travel radius of job locations</span>
                     </div>
                   </label>
                 </div>
@@ -552,7 +556,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                         <p className="text-xs font-bold text-slate-900 truncate max-w-sm">
                           {resumeDisplayName}
                         </p>
-                        <p className="text-[10px] text-slate-500">Candidate Original Resume File</p>
+                        <p className="text-xs text-slate-500">Candidate Original Resume File</p>
                       </div>
                     </div>
 
@@ -589,7 +593,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                 </div>
               ) : (
                 <div className="p-12 text-center space-y-3 bg-slate-50 rounded-2xl border border-slate-200">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-200/70 text-slate-400 flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-200/70 text-slate-500 flex items-center justify-center mx-auto">
                     <FileText className="w-6 h-6" />
                   </div>
                   <h3 className="text-sm font-bold text-slate-800">No CV Attached</h3>

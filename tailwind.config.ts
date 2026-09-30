@@ -6,6 +6,9 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Feature components (JobCard, JobListings, FilterSidebar, ...) ship their
+    // own markup and would otherwise be missing every utility they use.
+    "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
@@ -16,6 +19,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -58,13 +64,23 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          blue: "#2563eb",
+          primary: "#2563eb",
+          primaryDark: "#1d4ed8",
           navy: "#0f172a",
+          accent: "#4f46e5",
+          success: "#059669",
+          successSoft: "#ecfdf5",
+          warning: "#d97706",
+          warningSoft: "#fffbeb",
+          danger: "#e11d48",
+          dangerSoft: "#fff1f2",
+          whatsapp: "#25D366",
+          // legacy aliases (do not use in new code)
+          blue: "#2563eb",
           emerald: "#10b981",
           amber: "#f59e0b",
           indigo: "#4f46e5",
           purple: "#7c3aed",
-          whatsapp: "#25D366"
         }
       },
       borderRadius: {

@@ -2,11 +2,13 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Job } from "@/types";
 import {
   useGetJobsQuery,
   useGetCategoriesQuery,
   useGetCitiesQuery,
+  useGetServiceModulesQuery,
 } from "@/services/api/jobsApi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -48,7 +50,6 @@ import { AppDownloadBanner } from "@/components/home/AppDownloadBanner";
 import { Testimonials } from "@/components/home/Testimonials";
 import { FAQSection } from "@/components/home/FAQSection";
 import { Footer } from "@/components/home/Footer";
-import { useGetSettingsQuery } from "@/services/api/settingsApi";
 
 export default function HomePage() {
   const router = useRouter();
@@ -58,8 +59,6 @@ export default function HomePage() {
     const jobId = job.id || (job as any)._id;
     router.push(`/job/${jobId}`);
   };
-  const { data: settingsData } = useGetSettingsQuery();
-  const showPricingOnHomepage = settingsData?.show_pricing_on_homepage !== "false";
 
   // Redux Slices State
   const { selectedCity, selectedCategory, searchQuery } = useAppSelector(
@@ -97,13 +96,16 @@ export default function HomePage() {
   const { data: jobs = [] } = useGetJobsQuery({
     city: selectedCity,
     category: selectedCategory,
-    query: searchQuery,
+    query: searchQuery.trim().slice(0, 100),
     page: currentPage,
     limit: PAGE_SIZE,
   });
 
   const totalJobs = (jobs as any).total ?? jobs.length;
   const totalPages = (jobs as any).totalPages ?? 1;
+
+  // Hiring plans — always visible on homepage
+  const { data: serviceModules = [] } = useGetServiceModulesQuery();
 
   const handleConnectHR = (job: Job, mode: "call" | "whatsapp") => {
     const jobId = job.id || job._id;
@@ -200,6 +202,67 @@ export default function HomePage() {
 
       {/* 9. 3-Step How It Works Guide */}
       <HowItWorks />
+
+      {/* 10. Simple Hiring Plans — always visible */}
+      <section className="py-12 bg-white border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-700">Simple Pricing</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+              3 Hiring Modules, One Flat Price Each
+            </h2>
+            <p className="text-xs text-slate-500 mt-2">
+              No role-wise rates, no hidden charges. Pick the module that fits how you hire.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {(serviceModules as any[]).slice(0, 3).map((plan: any, idx: number) => (
+              <div
+                key={plan.id || plan._id || idx}
+                className={`bg-slate-50 rounded-3xl border-2 p-6 flex flex-col justify-between ${
+                  plan.isPopular ? "border-blue-600 shadow-md" : "border-slate-200"
+                }`}
+              >
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">{plan.title}</h3>
+                  {plan.subtitle && (
+                    <p className="text-xs text-slate-500 mt-0.5">{plan.subtitle}</p>
+                  )}
+                  <p className="text-2xl font-black text-slate-900 mt-3 tracking-tight">
+                    {plan.priceDisplay}
+                  </p>
+                  <ul className="space-y-2 mt-4">
+                    {(plan.features || []).slice(0, 5).map((feat: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
+                          ✓
+                        </span>
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.replacementPolicy && plan.replacementPolicy !== "Not Included" && (
+                    <p className="mt-3 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                      {plan.replacementPolicy}
+                    </p>
+                  )}
+                </div>
+                <Link
+                  href="/employer/plans"
+                  className={`mt-5 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    plan.isPopular
+                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-xs"
+                      : "bg-slate-900 text-white hover:bg-slate-800"
+                  }`}
+                >
+                  <span>Buy Plan</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* 12. Mobile App & WhatsApp Notification Promo */}
       <AppDownloadBanner />
