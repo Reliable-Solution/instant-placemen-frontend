@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loadUserFromStorage, logout } from "@/store/slices/authSlice";
+import { loadUserFromStorage, logout, verifyRoleFromToken } from "@/store/slices/authSlice";
 import {
   LayoutDashboard,
   User,
@@ -27,6 +27,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   const { user } = useAppSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [validated, setValidated] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -38,7 +39,8 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (mounted && !isLoginPage) {
       const savedUserStr = localStorage.getItem("ip_user");
-      if (!savedUserStr) {
+      const savedToken = localStorage.getItem("ip_token");
+      if (!savedUserStr || !savedToken) {
         router.push("/candidate/login");
         return;
       }
@@ -49,6 +51,12 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
           router.push("/candidate/login?role_mismatch=true");
           return;
         }
+        if (!verifyRoleFromToken(savedToken, "CANDIDATE")) {
+          // Token missing, expired, or role mismatch — force re-login
+          router.push("/candidate/login");
+          return;
+        }
+        setValidated(true);
       } catch {
         router.push("/candidate/login");
       }
@@ -56,11 +64,18 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   }, [mounted, isLoginPage, router]);
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-50 text-slate-900">{children}</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+          Skip to main content
+        </a>
+        <main id="main-content">{children}</main>
+      </div>
+    );
   }
 
-  // Show loading until mounted and auth check runs
-  if (!mounted) {
+  // Gate render until token + role validated (don't render children if invalid)
+  if (!mounted || !validated) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center space-y-3">
@@ -86,16 +101,19 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+        Skip to main content
+      </a>
       {/* Mobile Topbar: Sticky at the top */}
-      <header className="md:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
+      <header className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
         <Link href="/" className="flex items-center gap-2">
           <img
             src="/logo.png"
             alt="Instant Placement"
             className="h-10 w-auto max-w-[190px] object-contain"
           />
-          <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+          <span className="text-xs text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
             Candidate
           </span>
         </Link>
@@ -127,7 +145,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                   alt="Instant Placement"
                   className="h-10 w-auto max-w-[190px] object-contain"
                 />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200">
                   Candidate
                 </span>
               </Link>
@@ -149,7 +167,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                   <span>{user?.name || "Job Seeker"}</span>
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 </p>
-                <p className="text-[11px] text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
               </div>
             </div>
 
@@ -201,7 +219,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Desktop Sidebar: Locked permanently to the left viewport, never scrolls with page data */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white border-r border-slate-200 shadow-xs">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white dark:bg-slate-900 border-r border-slate-200 shadow-xs">
         <div className="flex flex-col flex-1 h-full min-h-0">
           {/* Brand Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -212,7 +230,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                 className="h-10 w-auto max-w-[190px] object-contain"
               />
             </Link>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
               Candidate
             </span>
           </div>
@@ -227,7 +245,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                 <span>{user?.name || "Job Seeker"}</span>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               </p>
-              <p className="text-[11px] text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
+              <p className="text-xs text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
             </div>
           </div>
 
@@ -277,8 +295,8 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content Area: Offset by sidebar width (md:pl-64), scrolls naturally without dragging sidebar */}
-      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 pb-20 md:pb-8">
-        <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto min-w-0">
+      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 md:pb-8">
+        <main id="main-content" className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>
@@ -299,16 +317,16 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all relative ${
-                isActive ? "text-indigo-600 font-bold" : "text-slate-500 hover:text-slate-800"
+                isActive ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <div className="relative">
-                <Icon className={`w-5 h-5 ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
+                <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-slate-500"}`} />
                 {isActive && (
-                  <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-blue-600" />
                 )}
               </div>
-              <span className="text-[10px] mt-0.5 tracking-tight">{item.label}</span>
+              <span className="text-xs mt-0.5 tracking-tight">{item.label}</span>
             </Link>
           );
         })}

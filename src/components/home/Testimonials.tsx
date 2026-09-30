@@ -81,7 +81,7 @@ export const Testimonials: React.FC = () => {
                   <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 </div>
                 <p className="text-xs text-slate-500 truncate">{r.role}</p>
-                <span className="text-[10px] font-bold text-emerald-600">{r.salary}</span>
+                <span className="text-xs font-bold text-emerald-600">{r.salary}</span>
               </div>
             </div>
           </div>

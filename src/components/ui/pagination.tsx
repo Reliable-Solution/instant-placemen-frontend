@@ -114,7 +114,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               return (
                 <span
                   key={`ellipsis-${idx}`}
-                  className="w-8 h-8 flex items-center justify-center text-xs text-slate-400 font-bold select-none"
+                  className="w-8 h-8 flex items-center justify-center text-xs text-slate-500 font-bold select-none"
                 >
                   •••
                 </span>

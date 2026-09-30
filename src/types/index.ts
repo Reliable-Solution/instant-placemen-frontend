@@ -56,7 +56,9 @@ export interface Category {
   name?: string;
   slug: string;
   icon: string;
+  image?: string;
   activeJobsCount: number;
+  totalVacancies?: number;
   avgSalary: string;
   color: string;
   badge?: string;

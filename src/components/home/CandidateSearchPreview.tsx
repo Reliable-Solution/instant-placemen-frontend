@@ -55,7 +55,7 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mt-3 tracking-tight">
             Search <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">10 Lakh+</span> Active Candidate Profiles
           </h2>
-          <p className="text-slate-400 text-sm mt-2 max-w-lg mx-auto">
+          <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
             Browse verified local job seekers ready for immediate joining in your city.
           </p>
         </div>
@@ -105,13 +105,13 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {isLoading ? (
             <div className="col-span-full py-12 text-center">
-              <div className="inline-flex items-center gap-2 text-xs text-slate-400">
+              <div className="inline-flex items-center gap-2 text-xs text-slate-500">
                 <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
                 Loading active candidates from database...
               </div>
             </div>
           ) : candidates.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-xs text-slate-400">
+            <div className="col-span-full py-12 text-center text-xs text-slate-500">
               No candidates found for this search. Try a different city or role.
             </div>
           ) : (
@@ -133,13 +133,13 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
                             <span>{c.name}</span>
                             <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" />
                           </h4>
-                          <p className="text-xs text-slate-400 flex items-center gap-1">
+                          <p className="text-xs text-slate-500 flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
                             {c.city}
                           </p>
                         </div>
                       </div>
-                      <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-[10px] py-0.5 shrink-0">
+                      <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-xs py-0.5 shrink-0">
                         Immediate Joiner
                       </Badge>
                     </div>
@@ -148,13 +148,13 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
                       <p className="font-semibold text-xs text-emerald-300">
                         {c.skills?.[0] ? `${c.skills[0]} Specialist` : "Verified Candidate"}
                       </p>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                         <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{c.experience}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" />{c.qualification}</span>
                       </div>
                       {c.resumeSummary && (
-                        <p className="text-[11px] text-slate-400 italic line-clamp-2 mt-1.5 leading-relaxed">
+                        <p className="text-xs text-slate-500 italic line-clamp-2 mt-1.5 leading-relaxed">
                           &quot;{c.resumeSummary}&quot;
                         </p>
                       )}
@@ -164,7 +164,7 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
                       {c.skills?.map((s: string, idx: number) => (
                         <span
                           key={idx}
-                          className="text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/20"
+                          className="text-xs bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/20"
                         >
                           {s}
                         </span>
@@ -179,7 +179,7 @@ export const CandidateSearchPreview: React.FC<CandidateSearchPreviewProps> = ({
                         <span>{c.phone}</span>
                       </span>
                     ) : (
-                      <span className="text-[11px] text-slate-500">Phone: +91 98••••••••</span>
+                      <span className="text-xs text-slate-500">Phone: +91 98••••••••</span>
                     )}
 
                     <Button

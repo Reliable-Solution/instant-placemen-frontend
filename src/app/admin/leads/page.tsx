@@ -1,14 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useGetLeadsQuery, useGetLeadStatsQuery } from "@/services/api/leadApi";
 import { Phone, Calendar, TrendingUp, Users } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
+import { TableSkeleton } from "@/components/Skeleton";
 
 export default function AdminLeadsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
   const { data: stats, isLoading: statsLoading } = useGetLeadStatsQuery();
-  const { data: leadsData, isLoading: leadsLoading } = useGetLeadsQuery({ limit: 100 });
+  const { data: leadsData, isLoading: leadsLoading } = useGetLeadsQuery({ page: currentPage, limit: PAGE_SIZE });
 
   const leads = leadsData?.leads || [];
+  const totalLeads = leadsData?.total ?? leads.length;
+  const totalPages = leadsData?.totalPages ?? 1;
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -61,12 +67,12 @@ export default function AdminLeadsPage() {
         </div>
 
         {leadsLoading ? (
-          <div className="p-10 text-center text-slate-400">Loading...</div>
+          <TableSkeleton rows={6} />
         ) : leads.length === 0 ? (
-          <div className="p-10 text-center text-slate-400">No leads yet</div>
+          <div className="p-10 text-center text-slate-500">No leads yet</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="text-left py-3 px-4 font-bold text-slate-600">#</th>
@@ -79,10 +85,10 @@ export default function AdminLeadsPage() {
               <tbody>
                 {leads.map((lead, idx) => (
                   <tr key={lead._id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                    <td className="py-3 px-4 text-slate-400">{idx + 1}</td>
+                    <td className="py-3 px-4 text-slate-500">{idx + 1}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-slate-400" />
+                        <Phone className="w-4 h-4 text-slate-500" />
                         <span className="font-semibold text-slate-900">{lead.phone}</span>
                       </div>
                     </td>
@@ -117,6 +123,17 @@ export default function AdminLeadsPage() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalLeads}
+          pageSize={PAGE_SIZE}
+          onPageChange={(page) => setCurrentPage(page)}
+          className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-4"
+        />
+      )}
     </div>
   );
 }

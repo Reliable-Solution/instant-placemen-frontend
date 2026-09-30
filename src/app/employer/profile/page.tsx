@@ -209,12 +209,12 @@ export default function EmployerProfilePage() {
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <h3 className="text-xs font-bold text-slate-900">Official Company Brand Logo</h3>
               {activeLogo && (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
                   Logo Active ✓
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs text-slate-500">
               Display on job cards, candidate interview invitations, and admin verification portal. PNG or SVG recommended.
             </p>
             <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
@@ -242,7 +242,7 @@ export default function EmployerProfilePage() {
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-700">Registered Company Name</label>
           <div className="relative">
-            <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Building2 className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
             <Input
               required
               value={companyName}
@@ -255,7 +255,7 @@ export default function EmployerProfilePage() {
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-700">Primary Hiring Manager Name</label>
           <div className="relative">
-            <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
             <Input
               required
               value={name}
@@ -269,7 +269,7 @@ export default function EmployerProfilePage() {
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Work Phone / WhatsApp</label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Phone className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <Input
                 required
                 value={phone}
@@ -282,7 +282,7 @@ export default function EmployerProfilePage() {
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">Primary City</label>
             <div className="relative">
-              <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <MapPin className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <Input
                 required
                 value={city}
@@ -296,7 +296,7 @@ export default function EmployerProfilePage() {
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-700">Account Email (Permanent)</label>
           <div className="relative">
-            <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
             <Input
               disabled
               value={user?.email || "instantplacement.in@gmail.com"}

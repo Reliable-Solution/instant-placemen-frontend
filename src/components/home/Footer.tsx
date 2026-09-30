@@ -338,7 +338,7 @@ export const Footer: React.FC<FooterProps> = ({
               <Headphones className="w-7 h-7 text-blue-600 shrink-0 stroke-[2]" />
               <div>
                 <h4 className="text-sm font-black text-slate-900 leading-tight">Need Help?</h4>
-                <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                <p className="text-xs text-slate-500 leading-tight mt-0.5">
                   Have questions or need help with hiring? Reach our support desk.
                 </p>
               </div>
@@ -351,7 +351,7 @@ export const Footer: React.FC<FooterProps> = ({
             >
               <Phone className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform stroke-[2.2]" />
               <div className="min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-tight">Phone</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block leading-tight">Phone</span>
                 <span className="text-xs font-black text-slate-900 group-hover:text-blue-600 font-mono whitespace-nowrap">
                   {supportPhone}
                 </span>
@@ -365,7 +365,7 @@ export const Footer: React.FC<FooterProps> = ({
             >
               <Mail className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform stroke-[2.2]" />
               <div className="min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-tight">Email</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block leading-tight">Email</span>
                 <span className="text-xs font-black text-slate-900 group-hover:text-blue-600 whitespace-nowrap block">
                   {supportEmail}
                 </span>
@@ -381,7 +381,7 @@ export const Footer: React.FC<FooterProps> = ({
             >
               <MessageCircle className="w-4 h-4 text-emerald-500 shrink-0 group-hover:scale-110 transition-transform stroke-[2.2]" />
               <div className="min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-tight">WhatsApp</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block leading-tight">WhatsApp</span>
                 <span className="text-xs font-black text-slate-900 group-hover:text-emerald-600 font-mono whitespace-nowrap">
                   {supportWhatsapp}
                 </span>
@@ -392,8 +392,8 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex items-center gap-2 lg:border-l lg:border-slate-200 lg:pl-3">
               <Clock className="w-4 h-4 text-blue-600 shrink-0 stroke-[2.2]" />
               <div className="min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-tight">Business Hours</span>
-                <span className="text-[11px] font-bold text-slate-800 block leading-tight">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block leading-tight">Business Hours</span>
+                <span className="text-xs font-bold text-slate-800 block leading-tight">
                   {supportHours}
                 </span>
               </div>
@@ -403,13 +403,13 @@ export const Footer: React.FC<FooterProps> = ({
       </div>
 
       {/* ─── Bottom Dark Navy Copyright Bar ─── */}
-      <div className="bg-[#09152b] text-slate-400 text-xs py-5 border-t border-slate-900">
+      <div className="bg-[#09152b] text-slate-500 text-xs py-5 border-t border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <p className="text-[11px] text-slate-400 order-2 sm:order-1">
+          <p className="text-xs text-slate-500 order-2 sm:order-1">
             &copy; {new Date().getFullYear()} {footerCopyrightName}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px] order-1 sm:order-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs order-1 sm:order-2">
             <Link href="/privacy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>

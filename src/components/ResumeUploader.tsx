@@ -193,7 +193,7 @@ export default function ResumeUploader() {
             size="sm"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="border-red-200 text-red-600 hover:bg-red-50"
+            className="border-rose-200 text-rose-600 hover:bg-rose-50"
           >
             {isDeleting ? (
               <Loader2 className="w-4 h-4 animate-spin mr-1" />
@@ -251,12 +251,12 @@ export default function ResumeUploader() {
             </>
           ) : (
             <>
-              <Upload className="w-10 h-10 text-slate-400 mb-2" />
+              <Upload className="w-10 h-10 text-slate-500 mb-2" />
               <p className="text-sm font-bold text-slate-700">
                 Drag & drop your resume here
               </p>
               <p className="text-xs text-slate-500">or click to browse</p>
-              <p className="text-xs text-slate-400 mt-1">PDF only, max 5MB</p>
+              <p className="text-xs text-slate-500 mt-1">PDF only, max 5MB</p>
             </>
           )}
         </label>

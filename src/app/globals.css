@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,13 +29,50 @@
     --radius-lg: 1rem;
     --radius-xl: 1.5rem;
   }
+
+  /* Proper type scale — single source of truth */
+  h1 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  h2 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h4 {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+  }
+  p {
+    line-height: 1.625;
+  }
+  small {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: hsl(var(--foreground));
   background-color: #f8fafc;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
 }
 
 .glass-panel {
@@ -60,6 +95,33 @@ body {
     radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.2) 0px, transparent 50%);
 }
 
+/* Semantic palette helpers — trial
+   primary=blue-600, accent=indigo-600 (decorative only),
+   success=emerald, warning=amber, danger=rose */
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/25 transition-colors;
+  }
+  .nav-active {
+    @apply bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25;
+  }
+  .nav-active-soft {
+    @apply text-blue-600 font-bold;
+  }
+  .tint-success {
+    @apply bg-emerald-50 text-emerald-800 border-emerald-200;
+  }
+  .tint-warning {
+    @apply bg-amber-50 text-amber-800 border-amber-200;
+  }
+  .tint-danger {
+    @apply bg-rose-50 text-rose-700 border-rose-200;
+  }
+  .tint-info {
+    @apply bg-blue-50 text-blue-800 border-blue-200;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -76,7 +138,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }
 
 /* Respect reduced motion preferences */
@@ -95,15 +157,11 @@ body {
   }
 }
 
-/* Enforce minimum text size on mobile for readability */
+/* Mobile smoothing only - do not force min font-size,
+   compact dashboard labels (10-11px badges) must stay small */
 @media (max-width: 640px) {
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Ensure minimum 12px font size on mobile */
-  p, span, li, td, th, label, a, button {
-    min-font-size: 12px;
   }
 }

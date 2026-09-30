@@ -50,7 +50,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
 
         {/* Search input */}
         <div className="relative mt-1 shrink-0">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <Input
             placeholder="Search your city or locality (e.g. Surat, Noida, Mumbai)..."
             value={searchQuery}
@@ -76,7 +76,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
               </div>
               <div>
                 <p className="font-bold text-xs sm:text-sm">All India (Work From Home & Pan-India Jobs)</p>
-                <p className="text-[11px] sm:text-xs text-slate-500 line-clamp-1">50,000+ verified active openings across India</p>
+                <p className="text-xs sm:text-xs text-slate-500 line-clamp-1">50,000+ verified active openings across India</p>
               </div>
             </div>
             {selectedCity === "All India" && <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 shrink-0" />}
@@ -84,7 +84,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
 
           {/* Top Metros Grid */}
           <div className="space-y-2">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
+            <p className="text-xs sm:text-xs font-bold uppercase tracking-wider text-slate-500">
               Popular Cities & Metros ({filteredCities.length})
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
@@ -104,7 +104,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
                       <span className="font-bold text-xs sm:text-sm truncate">{city.name}</span>
                       {city.isMetro && (
                         <span
-                          className={`text-[9px] sm:text-[10px] px-1 py-0.2 rounded font-bold shrink-0 ${
+                          className={`text-xs sm:text-xs px-1 py-0.2 rounded font-bold shrink-0 ${
                             isSelected ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
                           }`}
                         >
@@ -112,7 +112,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between text-[11px] sm:text-xs w-full gap-1">
+                    <div className="flex items-center justify-between text-xs sm:text-xs w-full gap-1">
                       <span className={`truncate ${isSelected ? "text-blue-100" : "text-slate-500"}`}>
                         {city.state}
                       </span>

@@ -102,7 +102,9 @@ export function Toaster() {
           >
             {icon}
             <div className="flex-1 text-xs font-semibold leading-relaxed">
-              {t.message}
+              {typeof t.message === "object" && t.message !== null
+                ? (t.message as any).message || (t.message as any).title || JSON.stringify(t.message)
+                : String(t.message || "")}
             </div>
             <button
               onClick={() => toast.dismiss(t.id)}

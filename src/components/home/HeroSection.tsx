@@ -98,7 +98,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 value={localRole}
                 onChange={(e) => setLocalRole(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full bg-transparent text-sm font-medium focus:outline-none placeholder:text-slate-400 text-slate-800"
+                className="w-full bg-transparent text-sm font-medium focus:outline-none placeholder:text-slate-500 text-slate-800"
               />
             </div>
 
@@ -111,7 +111,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               >
                 <MapPin className="w-5 h-5 text-rose-500 shrink-0" />
                 <div className="truncate">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Job Location</p>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Job Location</p>
                   <p className="text-sm font-bold text-slate-800 truncate">
                     {selectedCity ? (selectedCity.toLowerCase() === "surat" ? "Surat, Gujarat" : selectedCity) : "Surat, Gujarat"}
                   </p>

@@ -8,10 +8,35 @@ export interface GetJobsQueryParams {
   experience?: string;
   jobType?: string;
   qualification?: string;
+  workMode?: string;
+  salaryBand?: string;
+  freshness?: string;
   urgent?: string;
   minSalary?: number;
   page?: number;
   limit?: number;
+}
+
+export interface FacetBucket {
+  value: string;
+  count: number;
+}
+
+export interface JobFacets {
+  city: FacetBucket[];
+  category: FacetBucket[];
+  experience: FacetBucket[];
+  qualification: FacetBucket[];
+  jobType: FacetBucket[];
+  workMode: FacetBucket[];
+  salaryBand: FacetBucket[];
+  freshness: FacetBucket[];
+}
+
+export interface JobFacetsResponse {
+  success: boolean;
+  total: number;
+  facets: JobFacets;
 }
 
 export interface JobsResponse {
@@ -205,6 +230,23 @@ export const jobsApi = baseApi.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Job", id }],
     }),
 
+    // Sidebar facet counts — same filters as getJobs, minus page/limit.
+    getJobFacets: builder.query<JobFacetsResponse, Omit<GetJobsQueryParams, "page" | "limit">>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params) {
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+              queryParams.append(key, String(value));
+            }
+          });
+        }
+        const qs = queryParams.toString();
+        return qs ? `/jobs/facets?${qs}` : "/jobs/facets";
+      },
+      providesTags: ["Job"],
+    }),
+
     postJob: builder.mutation<{ success: boolean; message: string }, any>({
       query: (body) => ({
         url: "/jobs",
@@ -219,6 +261,7 @@ export const jobsApi = baseApi.injectEndpoints({
 export const {
   useGetJobsQuery,
   useGetJobByIdQuery,
+  useGetJobFacetsQuery,
   useGetCategoriesQuery,
   useGetCitiesQuery,
   useGetServiceModulesQuery,

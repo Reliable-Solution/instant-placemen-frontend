@@ -24,11 +24,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import DynamicPlanModal from "@/components/employer/DynamicPlanModal";
 
 export default function EmployerJobsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedJobForPlan, setSelectedJobForPlan] = useState<any | null>(null);
   const PAGE_SIZE = 10;
 
   const { data: jobs = [], isLoading, refetch } = useGetEmployerJobsQuery({
@@ -72,16 +70,16 @@ export default function EmployerJobsPage() {
       {/* Jobs Table */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-xs text-slate-400">Loading your jobs...</div>
+          <div className="p-12 text-center text-xs text-slate-500">Loading your jobs...</div>
         ) : jobs.length === 0 ? (
-          <div className="p-12 text-center text-xs text-slate-400">
+          <div className="p-12 text-center text-xs text-slate-500">
             You have not posted any jobs yet. Click "Post New Mandate" to publish a vacancy.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <tr className="border-b border-slate-200 bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider">
                   <th className="p-4 pl-6">Job Role &amp; Category</th>
                   <th className="p-4">Location</th>
                   <th className="p-4">Salary Range</th>
@@ -99,7 +97,7 @@ export default function EmployerJobsPage() {
                     <tr key={job._id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="p-4 pl-6">
                         <div className="font-bold text-slate-900 text-xs">{job.title}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
+                        <div className="text-xs text-slate-500 mt-0.5">
                           <span>{job.category}</span>
                           <span className="text-slate-300 mx-1">•</span>
                           <span>{job.vacancies || 10} Openings</span>
@@ -111,14 +109,14 @@ export default function EmployerJobsPage() {
                           <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                           <span className="font-semibold">{job.city}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 block">{job.locality}</span>
+                        <span className="text-xs text-slate-500 block">{job.locality}</span>
                       </td>
 
                       <td className="p-4">
                         <span className="font-bold text-emerald-600">
                           ₹{(job.salaryMin / 1000).toFixed(0)}k - ₹{(job.salaryMax / 1000).toFixed(0)}k
                         </span>
-                        <span className="text-[10px] text-slate-400 block">/ month</span>
+                        <span className="text-xs text-slate-500 block">/ month</span>
                       </td>
 
                       <td className="p-4 text-center">
@@ -134,7 +132,7 @@ export default function EmployerJobsPage() {
                         {plan && plan.paymentStatus === "PAID" ? (
                           <div className="inline-flex flex-col items-center">
                             <Badge
-                              className={`text-[10px] font-bold px-2 py-0.5 ${
+                              className={`text-xs font-bold px-2 py-0.5 ${
                                 plan.tier === "module_1_resumes"
                                   ? "bg-blue-50 text-blue-800 border-blue-200"
                                   : plan.tier === "module_2_hiring"
@@ -148,29 +146,28 @@ export default function EmployerJobsPage() {
                                 ? `🤝 Mod 2: Active (${plan.orderedQuantity} Hires)`
                                 : `🛡️ Mod 3 Guarantee`}
                             </Badge>
-                            <button
-                              onClick={() => setSelectedJobForPlan(job)}
-                              className="text-[10px] text-blue-600 hover:underline mt-1 font-semibold"
+                            <Link
+                              href="/employer/plans"
+                              className="text-xs text-blue-600 hover:underline mt-1 font-semibold"
                             >
                               Upgrade Plan
-                            </button>
+                            </Link>
                           </div>
                         ) : (
-                          <Button
-                            size="sm"
-                            onClick={() => setSelectedJobForPlan(job)}
-                            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-[11px] h-7 px-3 rounded-lg shadow-xs gap-1"
+                          <Link
+                            href="/employer/plans"
+                            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs h-7 px-3 rounded-lg shadow-xs gap-1 inline-flex items-center"
                           >
                             <Zap className="w-3 h-3 text-amber-300 fill-amber-300" />
                             <span>Select Plan</span>
-                          </Button>
+                          </Link>
                         )}
                       </td>
 
                       <td className="p-4 text-center">
                         <button
                           onClick={() => handleToggle(job._id, job.status)}
-                          className={`text-[11px] font-bold px-3 py-1 rounded-full border transition-all ${
+                          className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${
                             job.status === "ACTIVE"
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                               : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
@@ -234,16 +231,6 @@ export default function EmployerJobsPage() {
         />
       )}
 
-      {/* Dynamic Role Pricing Modal */}
-      <DynamicPlanModal
-        isOpen={!!selectedJobForPlan}
-        onClose={() => setSelectedJobForPlan(null)}
-        job={selectedJobForPlan}
-        onPlanActivated={() => {
-          refetch();
-          setSelectedJobForPlan(null);
-        }}
-      />
     </div>
   );
 }

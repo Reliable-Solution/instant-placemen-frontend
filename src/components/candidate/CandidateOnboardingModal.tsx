@@ -260,7 +260,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
                 activeTab === "digital"
                   ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-500 hover:text-white"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -272,7 +272,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
                 activeTab === "pdf"
                   ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-500 hover:text-white"
               }`}
             >
               <Upload className="w-3.5 h-3.5" />
@@ -343,13 +343,13 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       </label>
                       {locality && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                          <span className="text-xs text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
                             {locality}
                           </span>
                           <button
                             type="button"
                             onClick={() => setLocality("")}
-                            className="text-[10px] text-rose-500 hover:text-rose-700 font-bold hover:underline"
+                            className="text-xs text-rose-500 hover:text-rose-700 font-bold hover:underline"
                           >
                             Clear
                           </button>
@@ -364,13 +364,13 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       className="h-10 text-xs rounded-xl"
                     />
                     <div className="flex flex-wrap gap-1 mt-1.5 items-center">
-                      <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Suggestions:</span>
+                      <span className="text-xs text-slate-500 font-semibold mr-0.5">Suggestions:</span>
                       {(LOCALITIES_BY_CITY[city] || ["Godadara", "Adajan", "Vesu", "Katargam", "Varachha"]).slice(0, 6).map((loc) => (
                         <button
                           key={loc}
                           type="button"
                           onClick={() => setLocality(loc)}
-                          className={`text-[10px] px-2 py-0.5 rounded-md border transition-all ${
+                          className={`text-xs px-2 py-0.5 rounded-md border transition-all ${
                             locality.toLowerCase() === loc.toLowerCase()
                               ? "bg-blue-600 text-white border-blue-600 font-bold"
                               : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
@@ -436,7 +436,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       <button
                         type="button"
                         onClick={() => setSelectedSkills([])}
-                        className="text-[11px] font-semibold text-rose-600 hover:underline"
+                        className="text-xs font-semibold text-rose-600 hover:underline"
                       >
                         Clear All
                       </button>
@@ -492,7 +492,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
 
                   {/* Quick Suggestions */}
                   <div>
-                    <span className="text-[10px] text-slate-500 font-bold block mb-1">
+                    <span className="text-xs text-slate-500 font-bold block mb-1">
                       Quick Suggestions (Click to add / toggle):
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -525,7 +525,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       Expected Salary (Monthly In-Hand)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                      <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-bold">₹</span>
                       <Input
                         type="number"
                         placeholder="18000"
@@ -568,7 +568,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                   <h4 className="text-xs font-bold text-slate-800">
                     {pdfFile ? pdfFile.name : "Click or drag your PDF resume here"}
                   </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Supports PDF up to 10MB</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Supports PDF up to 10MB</p>
                 </div>
 
                 {isParsingPdf && (
@@ -585,7 +585,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         Extracted CV Snapshot
                       </span>
-                      <Badge variant="outline" className="text-[10px] text-emerald-700 bg-emerald-50">
+                      <Badge variant="outline" className="text-xs text-emerald-700 bg-emerald-50">
                         Parsed
                       </Badge>
                     </div>
@@ -601,7 +601,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                           {parsedData.suggestedSkills.map((s) => (
                             <span
                               key={s}
-                              className="px-2 py-0.5 text-[10px] bg-white border border-slate-200 text-slate-800 rounded-md"
+                              className="px-2 py-0.5 text-xs bg-white border border-slate-200 text-slate-800 rounded-md"
                             >
                               {s}
                             </span>
@@ -632,13 +632,13 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       </label>
                       {locality && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                          <span className="text-xs text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
                             {locality}
                           </span>
                           <button
                             type="button"
                             onClick={() => setLocality("")}
-                            className="text-[10px] text-rose-500 hover:text-rose-700 font-bold hover:underline"
+                            className="text-xs text-rose-500 hover:text-rose-700 font-bold hover:underline"
                           >
                             Clear
                           </button>
@@ -653,13 +653,13 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       className="h-10 text-xs rounded-xl"
                     />
                     <div className="flex flex-wrap gap-1 mt-1.5 items-center">
-                      <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Suggestions:</span>
+                      <span className="text-xs text-slate-500 font-semibold mr-0.5">Suggestions:</span>
                       {(LOCALITIES_BY_CITY[city] || ["Godadara", "Adajan", "Vesu", "Katargam", "Varachha"]).slice(0, 6).map((loc) => (
                         <button
                           key={loc}
                           type="button"
                           onClick={() => setLocality(loc)}
-                          className={`text-[10px] px-2 py-0.5 rounded-md border transition-all ${
+                          className={`text-xs px-2 py-0.5 rounded-md border transition-all ${
                             locality.toLowerCase() === loc.toLowerCase()
                               ? "bg-blue-600 text-white border-blue-600 font-bold"
                               : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
@@ -678,7 +678,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                       Expected Monthly Salary
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                      <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-bold">₹</span>
                       <Input
                         type="number"
                         placeholder="18000"
@@ -722,7 +722,7 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                   I give explicit permission to Instant Placement to share my candidate profile, contact number, and CV with verified employers hiring in my city.
                 </label>
               </div>
-              <p className="text-[11px] text-slate-500 pl-7 flex items-center gap-1.5">
+              <p className="text-xs text-slate-500 pl-7 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>You can pause or revoke this consent anytime from your Candidate Profile Drawer.</span>
               </p>

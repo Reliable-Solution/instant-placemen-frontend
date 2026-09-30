@@ -113,20 +113,20 @@ export default function EmployerJobDetailPage() {
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
         <div className="relative z-10 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${statusColor}`}>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${statusColor}`}>
               {job.status}
             </span>
             {job.isUrgent && (
-              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/30 flex items-center gap-1">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/30 flex items-center gap-1">
                 <Zap className="w-3 h-3 fill-current" /> Urgent
               </span>
             )}
             {job.isVerified && (
-              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> Verified
               </span>
             )}
-            <span className="text-[11px] text-blue-200 ml-auto">{job.category}</span>
+            <span className="text-xs text-blue-200 ml-auto">{job.category}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">{job.title}</h1>
@@ -165,7 +165,7 @@ export default function EmployerJobDetailPage() {
           { label: "Qualification", value: job.qualification || "12th Pass", icon: GraduationCap },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
-            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1 mb-1">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-1 mb-1">
               <Icon className="w-3 h-3" /> {label}
             </p>
             <p className="text-xs font-bold text-slate-900">{value}</p>
@@ -204,7 +204,7 @@ export default function EmployerJobDetailPage() {
 
             {job.skillsRequired && job.skillsRequired.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Required Skills</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Required Skills</p>
                 <div className="flex flex-wrap gap-1.5">
                   {job.skillsRequired.map((sk: string, i: number) => (
                     <span key={i} className="px-2.5 py-1 rounded-lg bg-violet-600 text-white text-xs font-semibold">
@@ -217,7 +217,7 @@ export default function EmployerJobDetailPage() {
 
             {job.preferredSkills && job.preferredSkills.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Preferred Skills</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Preferred Skills</p>
                 <div className="flex flex-wrap gap-1.5">
                   {job.preferredSkills.map((sk: string, i: number) => (
                     <span key={i} className="px-2.5 py-1 rounded-lg bg-slate-700 text-white text-xs font-semibold">
@@ -230,7 +230,7 @@ export default function EmployerJobDetailPage() {
 
             {job.languages && job.languages.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                   <Languages className="w-3 h-3" /> Languages Required
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -262,7 +262,7 @@ export default function EmployerJobDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-900">{job.contactPerson?.name || "Recruiter"}</p>
-                <p className="text-[11px] text-slate-500">{job.contactPerson?.role || "Talent Acquisition"}</p>
+                <p className="text-xs text-slate-500">{job.contactPerson?.role || "Talent Acquisition"}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -283,7 +283,7 @@ export default function EmployerJobDetailPage() {
                 <span>WhatsApp: +91 {job.contactPerson?.whatsapp}</span>
               </a>
               {job.contactPerson?.callTimings && (
-                <p className="text-[11px] text-slate-400 text-center">⏰ {job.contactPerson.callTimings}</p>
+                <p className="text-xs text-slate-500 text-center">⏰ {job.contactPerson.callTimings}</p>
               )}
             </div>
           </div>

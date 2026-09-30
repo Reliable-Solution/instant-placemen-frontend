@@ -155,6 +155,21 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Category"],
     }),
+    updateCategory: builder.mutation<any, { id: string; data: any }>({
+      query: ({ id, data }) => ({
+        url: `/categories/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Category"],
+    }),
+    uploadCategoryImage: builder.mutation<{ success: boolean; imageUrl: string; message?: string }, FormData>({
+      query: (formData) => ({
+        url: "/categories/upload-image",
+        method: "POST",
+        body: formData,
+      }),
+    }),
     createCity: builder.mutation<any, any>({
       query: (body) => ({
         url: "/cities",
@@ -215,6 +230,14 @@ export const adminApi = baseApi.injectEndpoints({
         body: { jobId },
       }),
     }),
+    getAdminSubscriptions: builder.query<{ success: boolean; subscriptions: any[]; pending: any[]; failed: any[] }, { status?: string } | void>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.status) queryParams.set("status", params.status);
+        return `/admin/subscriptions?${queryParams.toString()}`;
+      },
+      providesTags: ["Admin", "Stats"],
+    }),
   }),
 });
 
@@ -230,7 +253,9 @@ export const {
   useGetAdminApplicationsQuery,
   useUpdateAdminApplicationStatusMutation,
   useCreateCategoryMutation,
+  useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useUploadCategoryImageMutation,
   useCreateCityMutation,
   useDeleteCityMutation,
   useGetAdminPlansQuery,
@@ -239,6 +264,7 @@ export const {
   useDeletePlanMutation,
   useToggleArchivePlanMutation,
   useSendCandidateJobAlertMutation,
+  useGetAdminSubscriptionsQuery,
 } = adminApi;
 
 

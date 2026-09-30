@@ -122,7 +122,9 @@ export interface Category {
   title: string;
   slug: string;
   icon?: string;
+  image?: string;
   activeJobsCount?: number;
+  totalVacancies?: number;
   avgSalary?: string;
   badge?: string;
   trending?: boolean;

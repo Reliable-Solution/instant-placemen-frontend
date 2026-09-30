@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
-import { DirectHRConnectModal } from "@/components/home/DirectHRConnectModal";
-import { CandidateAuthModal } from "@/components/home/CandidateAuthModal";
+import { DirectHRConnectModal } from "@/features/interviews/DirectHRConnectModal";
+import { CandidateAuthModal } from "@/features/auth/CandidateAuthModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -51,11 +51,11 @@ export default function JobDetailPage() {
   });
 
   const { data: similarJobsData } = useGetJobsQuery(
-    job ? { city: job.city, category: job.categoryId, limit: 4 } : undefined,
+    job ? { city: job.city, limit: 6 } : undefined,
     { skip: !job }
   );
   const similarJobs = Array.isArray(similarJobsData)
-    ? similarJobsData.filter((j) => (j.id || (j as any)._id) !== jobId).slice(0, 3)
+    ? similarJobsData.filter((j) => (j.id || (j as any)._id) !== jobId).slice(0, 4)
     : [];
 
   const user = useAppSelector((state) => state.auth.user);
@@ -286,7 +286,7 @@ export default function JobDetailPage() {
       <div className="min-h-screen bg-slate-50 flex flex-col">
         {commonNavbar}
         <div className="flex-1 max-w-2xl mx-auto px-4 py-20 text-center">
-          <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Job Opening Not Found</h2>
@@ -314,18 +314,17 @@ export default function JobDetailPage() {
           <Link href="/" className="hover:text-blue-600 font-medium">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
           <Link href={`/?city=${encodeURIComponent(job.city)}`} className="hover:text-blue-600 font-medium">
             Jobs in {job.city}
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
           <span className="text-slate-800 font-semibold truncate">{job.title}</span>
         </div>
       </div>
 
       {/* Main Container */}
-      {/* Main Container */}
-      <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
+      <div className="flex-1 max-w-7xl xl:max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {/* Back Link */}
         <div>
           <button
@@ -386,7 +385,7 @@ export default function JobDetailPage() {
             {/* Salary & Action Box in Banner */}
             <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-3 shrink-0">
               <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/15 text-left md:text-right">
-                <span className="text-[11px] uppercase tracking-wider text-blue-200 font-bold block">
+                <span className="text-xs uppercase tracking-wider text-blue-200 font-bold block">
                   Fixed Monthly Salary
                 </span>
                 <span className="text-2xl sm:text-3xl font-black text-amber-300">
@@ -443,27 +442,27 @@ export default function JobDetailPage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Experience Needed</p>
+                  <p className="text-slate-500 font-medium">Experience Needed</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.experience}</p>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Min Qualification</p>
+                  <p className="text-slate-500 font-medium">Min Qualification</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.qualification}</p>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Work Mode</p>
+                  <p className="text-slate-500 font-medium">Work Mode</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.workMode || "In-Office"}</p>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Shift Type</p>
+                  <p className="text-slate-500 font-medium">Shift Type</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.shift || "Day Shift"}</p>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Working Hours</p>
+                  <p className="text-slate-500 font-medium">Working Hours</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.workingHours || "10 AM - 7 PM"}</p>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-slate-400 font-medium">Working Days</p>
+                  <p className="text-slate-500 font-medium">Working Days</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{job.workingDays || "6 Days / Week"}</p>
                 </div>
               </div>
@@ -627,9 +626,9 @@ export default function JobDetailPage() {
             )}
           </div>
 
-          {/* Right Column: 1-Click Application Form (Sticky) */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg sticky top-24 space-y-5">
+          {/* Right Column: 1-Click Application Form (Clean Sticky Sidebar) */}
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg lg:sticky lg:top-24 space-y-5">
               <div className="border-b border-slate-100 pb-4">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-lg font-bold text-slate-900">1-Click Fast Apply</h3>
@@ -644,10 +643,10 @@ export default function JobDetailPage() {
                       }`}
                       title={isSaved ? "Saved to Bookmarks" : "Save this Job"}
                     >
-                      <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-amber-400 text-amber-500" : "text-slate-400"}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-amber-400 text-amber-500" : "text-slate-500"}`} />
                       <span>{isSaved ? "Saved" : "Save"}</span>
                     </button>
-                    <Badge variant="verified" className="text-[10px] py-0.5">
+                    <Badge variant="verified" className="text-xs py-0.5">
                       100% Free
                     </Badge>
                   </div>
@@ -691,7 +690,7 @@ export default function JobDetailPage() {
               ) : (
                 <form onSubmit={handleSubmitApplication} className="space-y-4">
                   {applyError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
+                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>{applyError}</span>
                     </div>
@@ -699,7 +698,7 @@ export default function JobDetailPage() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Full Name <span className="text-red-500">*</span>
+                      Full Name <span className="text-rose-500">*</span>
                     </label>
                     <Input
                       placeholder="e.g. Rahul Sharma"
@@ -712,10 +711,10 @@ export default function JobDetailPage() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      10-Digit WhatsApp Mobile <span className="text-red-500">*</span>
+                      10-Digit WhatsApp Mobile <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">+91</span>
+                      <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-semibold">+91</span>
                       <Input
                         type="tel"
                         maxLength={10}
@@ -763,7 +762,7 @@ export default function JobDetailPage() {
                       className="mt-0.5 rounded text-blue-600 focus:ring-blue-500"
                       required
                     />
-                    <span className="text-[11px] text-blue-900 leading-tight">
+                    <span className="text-xs text-blue-900 leading-tight">
                       I confirm I can commute daily to <strong>{job.locality}, {job.city}</strong> for this job.
                     </span>
                   </label>
@@ -782,36 +781,70 @@ export default function JobDetailPage() {
                     )}
                   </Button>
 
-                  <p className="text-[11px] text-slate-400 text-center">
+                  <p className="text-xs text-slate-500 text-center">
                     Instant Placement never charges candidates any fees.
                   </p>
                 </form>
               )}
             </div>
-
-            {/* Similar Jobs Box */}
-            {similarJobs.length > 0 && (
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                <h3 className="text-sm font-bold text-slate-900">Similar Jobs in {job.city}</h3>
-                <div className="space-y-2.5">
-                  {similarJobs.map((simJob) => (
-                    <Link
-                      key={simJob.id || (simJob as any)._id}
-                      href={`/job/${simJob.id || (simJob as any)._id}`}
-                      className="block p-3 rounded-xl hover:bg-slate-50 border border-slate-100 transition-colors"
-                    >
-                      <h4 className="text-xs font-bold text-slate-900 truncate">{simJob.title}</h4>
-                      <p className="text-[11px] text-slate-500 truncate">{simJob.company} • {simJob.locality}</p>
-                      <p className="text-xs font-extrabold text-blue-600 mt-1">
-                        {formatSalary(simJob.salaryMin, simJob.salaryMax, simJob.salaryType)}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Similar Jobs in this City (Full-width section below the 2-column layout) */}
+        {similarJobs.length > 0 && (
+          <div className="mt-8 bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" /> Similar Jobs in {job.city}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">Explore more verified job opportunities matching your profile</p>
+              </div>
+              <Link
+                href={`/jobs?city=${encodeURIComponent(job.city)}`}
+                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 group bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition-colors shrink-0"
+              >
+                <span>View All</span>
+                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {similarJobs.map((simJob) => (
+                <Link
+                  key={simJob.id || (simJob as any)._id}
+                  href={`/job/${simJob.id || (simJob as any)._id}`}
+                  className="p-4 rounded-xl border border-slate-200/90 hover:border-blue-400 hover:shadow-md transition-all bg-slate-50/40 hover:bg-white flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
+                        Verified
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        {simJob.postedAt ? timeAgo(simJob.postedAt) : "Recent"}
+                      </span>
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                      {simJob.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">
+                      {simJob.company} • {simJob.locality}, {simJob.city}
+                    </p>
+                  </div>
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs font-black text-blue-900">
+                      {formatSalary(simJob.salaryMin, simJob.salaryMax, simJob.salaryType)}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500 flex items-center gap-0.5 group-hover:text-blue-600">
+                      View Job <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Direct HR Connect Modal */}

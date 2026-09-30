@@ -71,10 +71,17 @@ export const initiateRazorpayCheckout = async (options: CheckoutOptions) => {
     }
 
     const { id: orderId, amount, key } = orderData.order;
+    const resolvedKey = key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    if (!resolvedKey) {
+      throw new Error("Payment gateway not configured. Missing Razorpay key.");
+    }
+    if (!options.employerEmail || !options.employerPhone) {
+      throw new Error("Employer email and phone are required for payment.");
+    }
 
     // 2. Configure Razorpay modal
     const razorpayOptions = {
-      key: key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TcFHTmoU96y71Z",
+      key: resolvedKey,
       amount,
       currency: "INR",
       name: "Instant Placement",
@@ -82,8 +89,8 @@ export const initiateRazorpayCheckout = async (options: CheckoutOptions) => {
       order_id: orderId,
       prefill: {
         name: options.employerName || "Hiring Manager",
-        email: options.employerEmail || "recruiter@instantplacement.in",
-        contact: options.employerPhone || "9876543210",
+        email: options.employerEmail,
+        contact: options.employerPhone,
       },
       theme: {
         color: "#2563eb",

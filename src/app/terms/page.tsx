@@ -7,7 +7,7 @@ import { useGetSettingsQuery } from "@/services/api/settingsApi";
 import { useAppSelector } from "@/store/hooks";
 import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
-import { CandidateAuthModal } from "@/components/home/CandidateAuthModal";
+import { CandidateAuthModal } from "@/features/auth/CandidateAuthModal";
 import { UserDashboardDrawer } from "@/features/auth/UserDashboardDrawer";
 import { CitySelectorModal } from "@/components/home/CitySelectorModal";
 import { useGetCitiesQuery } from "@/services/api/jobsApi";
@@ -102,7 +102,7 @@ export default function TermsPage() {
           <Link href="/" className="hover:text-blue-600 font-medium">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
           <span className="text-slate-800 font-bold">{pageTitle}</span>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function TermsPage() {
               <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                 <span>Last updated: {updatedDate}</span>
                 <span>•</span>
-                <span className="text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 text-[10px]">
+                <span className="text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 text-xs">
                   Official Terms of Use
                 </span>
               </p>

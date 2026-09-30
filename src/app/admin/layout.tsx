@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loadUserFromStorage, logout } from "@/store/slices/authSlice";
+import { loadUserFromStorage, logout, verifyRoleFromToken } from "@/store/slices/authSlice";
 import {
   LayoutDashboard,
   Briefcase,
@@ -17,6 +17,7 @@ import {
   LogOut,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
   Menu,
   X,
   Sparkles,
@@ -33,6 +34,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user } = useAppSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [validated, setValidated] = useState(false);
+  const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({
+    "/admin/taxonomies": true,
+  });
+
+  const toggleSubMenu = (href: string) => {
+    setOpenSubMenus((prev) => ({
+      ...prev,
+      [href]: !prev[href],
+    }));
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -53,7 +65,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const u = JSON.parse(savedUserStr);
         if (u.role !== "ADMIN" && u.role !== "RECRUITER") {
           router.push("/admin/login");
+          return;
         }
+        const tokenOk =
+          verifyRoleFromToken(savedToken, "ADMIN") ||
+          verifyRoleFromToken(savedToken, "RECRUITER");
+        if (!tokenOk) {
+          // Token missing, expired, or role mismatch — force re-login
+          router.push("/admin/login");
+          return;
+        }
+        setValidated(true);
       } catch {
         router.push("/admin/login");
       }
@@ -61,7 +83,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [mounted, isLoginPage, router]);
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-50 text-slate-900">{children}</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+          Skip to main content
+        </a>
+        <main id="main-content">{children}</main>
+      </div>
+    );
+  }
+
+  // Gate render until token + role validated (don't render children if invalid)
+  if (!mounted || !validated) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-600 text-sm font-medium">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   const navItems = [
@@ -70,12 +111,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Employers Directory", href: "/admin/employers", icon: Building2 },
     { label: "Candidates Database", href: "/admin/candidates", icon: Users },
     { label: "ATS Applications", href: "/admin/applications", icon: FileText },
-    { label: "Categories & Cities", href: "/admin/taxonomies", icon: Layers },
+    {
+      label: "Categories & Cities",
+      href: "/admin/taxonomies",
+      icon: Layers,
+      subItems: [
+        { label: "Job Categories", href: "/admin/taxonomies?tab=categories" },
+        { label: "Hiring Hub Cities", href: "/admin/taxonomies?tab=cities" },
+      ],
+    },
     { label: "FAQ Management", href: "/admin/faqs", icon: HelpCircle },
     { label: "Site Settings", href: "/admin/settings", icon: Settings },
     { label: "WhatsApp & Templates", href: "/admin/whatsapp", icon: MessageSquare },
     { label: "WhatsApp Leads", href: "/admin/leads", icon: MessageSquare },
     { label: "Plans Management", href: "/admin/plans", icon: CreditCard },
+    { label: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
     { label: "Operations Pipeline", href: "/admin/pipeline", icon: GitBranch },
   ];
 
@@ -86,16 +136,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
+        Skip to main content
+      </a>
       {/* Mobile Topbar: Sticky at the top */}
-      <header className="md:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
+      <header className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
         <Link href="/" className="flex items-center gap-2">
           <img
             src="/logo.png"
             alt="Instant Placement"
             className="h-10 w-auto max-w-[190px] object-contain"
           />
-          <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+          <span className="text-xs text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
             Admin
           </span>
         </Link>
@@ -129,7 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <span className="text-sm font-extrabold text-slate-900 tracking-tight">
                     Instant<span className="text-blue-600">Placement</span>
                   </span>
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-1 py-0.5 rounded border border-amber-200 block mt-0.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-1 py-0.5 rounded border border-amber-200 block mt-0.5">
                     Super Admin
                   </span>
                 </div>
@@ -149,32 +202,74 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-bold text-slate-900 truncate">{user?.name || "System Admin"}</p>
-                <p className="text-[11px] text-slate-500 truncate">{user?.email || "instantplacement.in@gmail.com"}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.email || "admin@example.com"}</p>
               </div>
             </div>
 
             {/* Nav links */}
             <nav className="flex-1 px-3 space-y-1 py-2 overflow-y-auto">
-              {navItems.map((item) => {
+              {navItems.map((item: any) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href || pathname === `${item.href}/`;
+                const hasSubItems = item.subItems && item.subItems.length > 0;
+                const isParentActive = pathname === item.href || (hasSubItems && pathname.startsWith(item.href));
+                const isOpen = !!openSubMenus[item.href];
+
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      isActive
-                        ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-500"}`} />
-                      <span>{item.label}</span>
-                    </div>
-                    {isActive && <ChevronRight className="w-3.5 h-3.5" />}
-                  </Link>
+                  <div key={item.href} className="space-y-0.5">
+                    {hasSubItems ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSubMenu(item.href)}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isParentActive
+                            ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                          <span>{item.label}</span>
+                        </div>
+                        {isOpen ? (
+                          <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                        )}
+                      </button>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                          isParentActive
+                            ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                          <span>{item.label}</span>
+                        </div>
+                        {isParentActive && <ChevronRight className="w-3.5 h-3.5" />}
+                      </Link>
+                    )}
+
+                    {/* Sub-menu accordion */}
+                    {hasSubItems && isOpen && (
+                      <div className="ml-5 pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-1 my-1">
+                        {item.subItems.map((sub: any) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className="block px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 transition-colors"
+                          >
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>
@@ -201,7 +296,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Desktop Sidebar: Locked permanently to the left viewport, never scrolls with page data */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white border-r border-slate-200 shadow-xs">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 bg-white dark:bg-slate-900 border-r border-slate-200 shadow-xs">
         <div className="flex flex-col flex-1 h-full min-h-0">
           {/* Brand Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -212,7 +307,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="h-10 w-auto max-w-[190px] object-contain"
               />
             </Link>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
               Admin
             </span>
           </div>
@@ -224,31 +319,72 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div className="overflow-hidden">
               <p className="text-xs font-bold text-slate-900 truncate">{user?.name || "System Admin"}</p>
-              <p className="text-[11px] text-slate-500 truncate">{user?.email || "instantplacement.in@gmail.com"}</p>
+              <p className="text-xs text-slate-500 truncate">{user?.email || "admin@example.com"}</p>
             </div>
           </div>
 
           {/* Nav Links: Scrolls independently only if window height is smaller than menu */}
           <nav className="flex-1 px-3 space-y-1 py-2 overflow-y-auto min-h-0">
-            {navItems.map((item) => {
+            {navItems.map((item: any) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const hasSubItems = item.subItems && item.subItems.length > 0;
+              const isParentActive = pathname === item.href || (hasSubItems && pathname.startsWith(item.href));
+              const isOpen = !!openSubMenus[item.href];
+
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
-                      ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-500"}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {isActive && <ChevronRight className="w-3.5 h-3.5" />}
-                </Link>
+                <div key={item.href} className="space-y-0.5">
+                  {hasSubItems ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleSubMenu(item.href)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        isParentActive
+                          ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {isOpen ? (
+                        <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                        isParentActive
+                          ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {isParentActive && <ChevronRight className="w-3.5 h-3.5" />}
+                    </Link>
+                  )}
+
+                  {/* Sub-menu accordion */}
+                  {hasSubItems && isOpen && (
+                    <div className="ml-5 pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-1 my-1">
+                      {item.subItems.map((sub: any) => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          className="block px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -274,8 +410,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content Area: Offset by sidebar width (md:pl-64), scrolls naturally without dragging sidebar */}
-      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50">
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto min-w-0">
+      <div className="md:pl-64 flex flex-col flex-1 min-w-0 min-h-screen bg-slate-50 dark:bg-slate-950">
+        <main id="main-content" className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>

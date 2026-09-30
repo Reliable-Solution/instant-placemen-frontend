@@ -282,8 +282,8 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
   const tierInfo = TIER_INFO[serviceTier];
 
   const StepBadge = ({ n, label, active, done }: { n: number; label: string; active: boolean; done: boolean }) => (
-    <div className={`flex items-center gap-1.5 text-xs font-semibold ${done ? "text-emerald-600" : active ? "text-blue-700" : "text-slate-400"}`}>
-      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${done ? "bg-emerald-100" : active ? "bg-blue-100" : "bg-slate-100"}`}>
+    <div className={`flex items-center gap-1.5 text-xs font-semibold ${done ? "text-emerald-600" : active ? "text-blue-700" : "text-slate-500"}`}>
+      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${done ? "bg-emerald-100" : active ? "bg-blue-100" : "bg-slate-100"}`}>
         {done ? "✓" : n}
       </span>
       {label}
@@ -325,7 +325,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
               </div>
 
               {authError && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   {authError}
                 </div>
@@ -392,15 +392,15 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
                       }`}
                     >
                       {tier === "module_2_hiring" && (
-                        <span className="absolute -top-2.5 right-3 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">POPULAR</span>
+                        <span className="absolute -top-2.5 right-3 bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">POPULAR</span>
                       )}
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${isEmerald ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600"}`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <p className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${isEmerald ? "text-emerald-700" : "text-blue-700"}`}>{info.label}</p>
+                      <p className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${isEmerald ? "text-emerald-700" : "text-blue-700"}`}>{info.label}</p>
                       <p className="text-sm font-bold text-slate-900">{info.name}</p>
                       <p className={`text-sm font-bold mt-1 ${isEmerald ? "text-emerald-700" : "text-blue-700"}`}>{info.price}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{info.sub}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{info.sub}</p>
                     </button>
                   );
                 })}
@@ -487,7 +487,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
               </div>
 
               {jobError && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   {jobError}
                 </div>
