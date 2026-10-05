@@ -14,6 +14,9 @@ export const getApiBaseUrl = (): string => {
     if (hostname.includes("alwaysdata.net")) {
       return `https://${hostname}/api/v1`;
     }
+    if (hostname.endsWith(".trycloudflare.com") || hostname.includes("ngrok")) {
+      return "/api/v1";
+    }
     if (hostname === "instantplacement.in" || hostname.endsWith(".instantplacement.in")) {
       return "https://api.instantplacement.in/api/v1";
     }

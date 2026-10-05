@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Sparkles,
 } from "lucide-react";
+import ChatButton from "@/components/chat/ChatButton";
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 
@@ -417,6 +418,9 @@ export default function CandidateApplicationsPage() {
                     <span>Applied {formatDate(job.appliedAt)}</span>
                   </div>
                 )}
+                <div className="ml-auto">
+                  <ChatButton applicationId={String(jobId)} label="Chat with HR" />
+                </div>
               </div>
 
               {/* EXPANDABLE INTERVIEW SLOT CARD (Mockup 12) */}
