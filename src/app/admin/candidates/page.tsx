@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useGetAdminCandidatesQuery } from "@/services/api/adminApi";
 import { useGetCandidateCitiesQuery } from "@/services/api/candidateApi";
+import Link from "next/link";
 import {
   Users,
   Search,
@@ -15,6 +16,7 @@ import {
   BadgeCheck,
   Eye,
   ExternalLink,
+  UserPlus,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -45,13 +47,23 @@ export default function AdminCandidatesPage() {
   const totalPages = (candidates as any).totalPages ?? 1;
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Candidate Talent Pool</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Explore all registered candidates, verified skills, and direct contact details. Click any candidate to view their complete profile and CV.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Candidate Talent Pool</h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Explore all registered candidates, verified skills, and direct contact details. Click any candidate to view their complete profile and CV.
+          </p>
+        </div>
+        <Link
+          href="/admin/candidates/add"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition-colors whitespace-nowrap self-start sm:self-auto"
+        >
+          <UserPlus className="w-4 h-4" />
+          <span>Add / Import Candidate</span>
+        </Link>
       </div>
 
       {/* Filter Bar */}
@@ -211,13 +223,15 @@ export default function AdminCandidatesPage() {
         />
       )}
 
+      </div>
+
       {/* Full Candidate Profile & CV Modal */}
       <CandidateDetailModal
         candidate={selectedCandidate}
         isOpen={!!selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
       />
-    </div>
+    </>
   );
 }
 

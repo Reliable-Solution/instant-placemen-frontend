@@ -3,15 +3,27 @@ import { baseApi } from "./baseApi";
 export interface Lead {
   _id: string;
   phone: string;
+  leadType?: "EMPLOYER" | "JOB_SEEKER" | "GENERAL";
+  name?: string;
+  city?: string;
+  status?: "Incomplete" | "Complete";
+  details?: Record<string, any>;
+  resumeFile?: string;
+  resumeUrl?: string;
+  resumeOriginalName?: string;
   source: string;
   ipAddress: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface LeadStats {
   todayCount: number;
   weekCount: number;
   totalCount: number;
+  employerCount?: number;
+  seekerCount?: number;
+  completeCount?: number;
 }
 
 export const leadApi = baseApi.injectEndpoints({
@@ -30,7 +42,7 @@ export const leadApi = baseApi.injectEndpoints({
 
     getLeads: builder.query<
       { leads: Lead[]; total: number; page: number; totalPages: number },
-      { page?: number; limit?: number; source?: string } | void
+      { page?: number; limit?: number; source?: string; leadType?: string; status?: string; search?: string } | void
     >({
       query: (params) => {
         const queryParams = new URLSearchParams();

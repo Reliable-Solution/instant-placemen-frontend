@@ -25,6 +25,9 @@ import {
   HelpCircle,
   Settings,
   MessageSquare,
+  UserPlus,
+  Receipt,
+  PhoneCall,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -105,29 +108,157 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  const navItems = [
-    { label: "Dashboard Overview", href: "/admin", icon: LayoutDashboard },
-    { label: "Jobs Moderation", href: "/admin/jobs", icon: Briefcase },
-    { label: "Employers Directory", href: "/admin/employers", icon: Building2 },
-    { label: "Candidates Database", href: "/admin/candidates", icon: Users },
-    { label: "ATS Applications", href: "/admin/applications", icon: FileText },
+  interface NavItem {
+    label: string;
+    href: string;
+    icon: any;
+    badge?: string;
+    subItems?: Array<{ label: string; href: string }>;
+  }
+
+  interface NavSection {
+    title: string;
+    items: NavItem[];
+  }
+
+  const navSections: NavSection[] = [
     {
-      label: "Categories & Cities",
-      href: "/admin/taxonomies",
-      icon: Layers,
-      subItems: [
-        { label: "Job Categories", href: "/admin/taxonomies?tab=categories" },
-        { label: "Hiring Hub Cities", href: "/admin/taxonomies?tab=cities" },
+      title: "Core",
+      items: [
+        { label: "Dashboard Overview", href: "/admin", icon: LayoutDashboard },
       ],
     },
-    { label: "FAQ Management", href: "/admin/faqs", icon: HelpCircle },
-    { label: "Site Settings", href: "/admin/settings", icon: Settings },
-    { label: "WhatsApp & Templates", href: "/admin/whatsapp", icon: MessageSquare },
-    { label: "WhatsApp Leads", href: "/admin/leads", icon: MessageSquare },
-    { label: "Plans Management", href: "/admin/plans", icon: CreditCard },
-    { label: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
-    { label: "Operations Pipeline", href: "/admin/pipeline", icon: GitBranch },
+    {
+      title: "Recruitment & ATS",
+      items: [
+        { label: "Jobs Moderation", href: "/admin/jobs", icon: Briefcase },
+        { label: "Candidates Database", href: "/admin/candidates", icon: Users },
+        {
+          label: "Add Candidates",
+          href: "/admin/candidates/add",
+          icon: UserPlus,
+          badge: "Importer",
+        },
+        { label: "ATS Applications", href: "/admin/applications", icon: FileText },
+        { label: "Operations Pipeline", href: "/admin/pipeline", icon: GitBranch },
+      ],
+    },
+    {
+      title: "Employers & Revenue",
+      items: [
+        { label: "Employers Directory", href: "/admin/employers", icon: Building2 },
+        { label: "Plans Management", href: "/admin/plans", icon: CreditCard },
+        { label: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
+      ],
+    },
+    {
+      title: "Communication & CRM",
+      items: [
+        { label: "WhatsApp & Templates", href: "/admin/whatsapp", icon: MessageSquare },
+        { label: "WhatsApp Leads", href: "/admin/leads", icon: PhoneCall },
+      ],
+    },
+    {
+      title: "Platform & Settings",
+      items: [
+        {
+          label: "Categories & Cities",
+          href: "/admin/taxonomies",
+          icon: Layers,
+          subItems: [
+            { label: "Job Categories", href: "/admin/taxonomies?tab=categories" },
+            { label: "Hiring Hub Cities", href: "/admin/taxonomies?tab=cities" },
+          ],
+        },
+        { label: "FAQ Management", href: "/admin/faqs", icon: HelpCircle },
+        { label: "Site Settings", href: "/admin/settings", icon: Settings },
+      ],
+    },
   ];
+
+  const renderNavSection = (section: NavSection, isMobile: boolean = false) => (
+    <div key={section.title} className="space-y-0.5 mb-3.5 last:mb-1">
+      <div className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        {section.title}
+      </div>
+      {section.items.map((item) => {
+        const Icon = item.icon;
+        const hasSubItems = item.subItems && item.subItems.length > 0;
+        const isParentActive =
+          item.href === "/admin"
+            ? pathname === "/admin"
+            : hasSubItems
+            ? pathname === item.href || pathname.startsWith(item.href)
+            : pathname === item.href;
+        const isOpen = !!openSubMenus[item.href];
+
+        return (
+          <div key={item.href} className="space-y-0.5">
+            {hasSubItems ? (
+              <button
+                type="button"
+                onClick={() => toggleSubMenu(item.href)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  isParentActive
+                    ? "bg-blue-600 text-white font-bold shadow-sm shadow-blue-600/20"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                  <span>{item.label}</span>
+                </div>
+                {isOpen ? (
+                  <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                )}
+              </button>
+            ) : (
+              <Link
+                href={item.href}
+                onClick={isMobile ? () => setSidebarOpen(false) : undefined}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isParentActive
+                    ? "bg-blue-600 text-white font-bold shadow-sm shadow-blue-600/20"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Icon className={`w-4 h-4 shrink-0 ${isParentActive ? "text-white" : "text-slate-500"}`} />
+                  <span className="truncate">{item.label}</span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {item.badge && !isParentActive && (
+                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-800">
+                      {item.badge}
+                    </span>
+                  )}
+                  {isParentActive && <ChevronRight className="w-3.5 h-3.5" />}
+                </div>
+              </Link>
+            )}
+
+            {/* Sub-menu accordion */}
+            {hasSubItems && isOpen && item.subItems && (
+              <div className="ml-5 pl-2.5 border-l-2 border-slate-200 dark:border-slate-800 space-y-1 my-1">
+                {item.subItems.map((sub: any) => (
+                  <Link
+                    key={sub.href}
+                    href={sub.href}
+                    onClick={isMobile ? () => setSidebarOpen(false) : undefined}
+                    className="block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {sub.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 
 
   const handleLogout = () => {
@@ -207,71 +338,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Nav links */}
-            <nav className="flex-1 px-3 space-y-1 py-2 overflow-y-auto">
-              {navItems.map((item: any) => {
-                const Icon = item.icon;
-                const hasSubItems = item.subItems && item.subItems.length > 0;
-                const isParentActive = pathname === item.href || (hasSubItems && pathname.startsWith(item.href));
-                const isOpen = !!openSubMenus[item.href];
-
-                return (
-                  <div key={item.href} className="space-y-0.5">
-                    {hasSubItems ? (
-                      <button
-                        type="button"
-                        onClick={() => toggleSubMenu(item.href)}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          isParentActive
-                            ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
-                          <span>{item.label}</span>
-                        </div>
-                        {isOpen ? (
-                          <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
-                        ) : (
-                          <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                        )}
-                      </button>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                          isParentActive
-                            ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
-                          <span>{item.label}</span>
-                        </div>
-                        {isParentActive && <ChevronRight className="w-3.5 h-3.5" />}
-                      </Link>
-                    )}
-
-                    {/* Sub-menu accordion */}
-                    {hasSubItems && isOpen && (
-                      <div className="ml-5 pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-1 my-1">
-                        {item.subItems.map((sub: any) => (
-                          <Link
-                            key={sub.href}
-                            href={sub.href}
-                            onClick={() => setSidebarOpen(false)}
-                            className="block px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 transition-colors"
-                          >
-                            {sub.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            <nav className="flex-1 px-3 py-2 overflow-y-auto">
+              {navSections.map((section) => renderNavSection(section, true))}
             </nav>
 
             {/* Footer */}
@@ -324,69 +392,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Nav Links: Scrolls independently only if window height is smaller than menu */}
-          <nav className="flex-1 px-3 space-y-1 py-2 overflow-y-auto min-h-0">
-            {navItems.map((item: any) => {
-              const Icon = item.icon;
-              const hasSubItems = item.subItems && item.subItems.length > 0;
-              const isParentActive = pathname === item.href || (hasSubItems && pathname.startsWith(item.href));
-              const isOpen = !!openSubMenus[item.href];
-
-              return (
-                <div key={item.href} className="space-y-0.5">
-                  {hasSubItems ? (
-                    <button
-                      type="button"
-                      onClick={() => toggleSubMenu(item.href)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        isParentActive
-                          ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
-                        <span>{item.label}</span>
-                      </div>
-                      {isOpen ? (
-                        <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                      )}
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                        isParentActive
-                          ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
-                        <span>{item.label}</span>
-                      </div>
-                      {isParentActive && <ChevronRight className="w-3.5 h-3.5" />}
-                    </Link>
-                  )}
-
-                  {/* Sub-menu accordion */}
-                  {hasSubItems && isOpen && (
-                    <div className="ml-5 pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-1 my-1">
-                      {item.subItems.map((sub: any) => (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
-                          className="block px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 transition-colors"
-                        >
-                          {sub.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <nav className="flex-1 px-3 py-2 overflow-y-auto min-h-0">
+            {navSections.map((section) => renderNavSection(section, false))}
           </nav>
 
           {/* Footer Actions: Always docked at bottom */}

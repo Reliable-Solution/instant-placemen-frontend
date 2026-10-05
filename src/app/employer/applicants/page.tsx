@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useRef } from "react";
+import React, { useState, useEffect, Suspense, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ChatButton from "@/components/chat/ChatButton";
 import { Pagination } from "@/components/ui/pagination";
 import { useGetSettingsQuery } from "@/services/api/settingsApi";
 import { getApiBaseUrl } from "@/lib/config";
@@ -264,19 +265,35 @@ function ApplicantsContent() {
     limit: PAGE_SIZE,
   });
 
-  const applicantList = Array.isArray(applicants) ? applicants : (applicants as any).data || [];
+  const applicantList = useMemo(
+    () => (Array.isArray(applicants) ? applicants : (applicants as any)?.data || []),
+    [applicants]
+  );
 
-  // Sync server applicants to local optimistic state (normalize legacy statuses)
+  // Sync server applicants to local optimistic state (normalize legacy statuses).
+  // Guarded by a content signature: RTK's `= []` fallback and transformResponse
+  // produce a fresh array identity on renders where data is unchanged/undefined,
+  // which retriggered this effect forever ("Maximum update depth exceeded").
+  const applicantsSig = useMemo(
+    () =>
+      JSON.stringify(
+        (applicantList as any[]).map(
+          (a: any) => `${a?._id}:${a?.status}:${a?.updatedAt || ""}`
+        )
+      ),
+    [applicantList]
+  );
+  const lastApplicantsSig = useRef("");
   useEffect(() => {
-    if (applicantList) {
-      setLocalApplicants(
-        (applicantList as any[]).map((a: any) => ({
-          ...a,
-          status: LEGACY_STATUS_MAP[a.status] || a.status,
-        }))
-      );
-    }
-  }, [applicantList]);
+    if (lastApplicantsSig.current === applicantsSig) return;
+    lastApplicantsSig.current = applicantsSig;
+    setLocalApplicants(
+      (applicantList as any[]).map((a: any) => ({
+        ...a,
+        status: LEGACY_STATUS_MAP[a.status] || a.status,
+      }))
+    );
+  }, [applicantsSig, applicantList]);
 
   const [updateStage] = useUpdateApplicantStageMutation();
 
@@ -759,6 +776,7 @@ function ApplicantsContent() {
 
                               {isContactUnlocked ? (
                                 <div className="flex items-center gap-1.5">
+                                  <ChatButton applicationId={String(app._id)} label="Chat" />
                                   <button
                                     type="button"
                                     onClick={() =>
@@ -954,6 +972,7 @@ function ApplicantsContent() {
                         <td className="p-4">
                           {isContactUnlocked ? (
                             <div className="flex items-center gap-1.5">
+                              <ChatButton applicationId={String(app._id)} label="Chat" />
                               <Button
                                 size="sm"
                                 onClick={() =>

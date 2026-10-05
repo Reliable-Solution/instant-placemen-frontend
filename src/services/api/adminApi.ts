@@ -111,6 +111,29 @@ export const adminApi = baseApi.injectEndpoints({
       },
       providesTags: ["Admin", "Candidate"],
     }),
+    uploadCandidateResume: builder.mutation<{ success: boolean; resumeFile?: string; resumeUrl?: string; originalName?: string; message?: string }, FormData>({
+      query: (formData) => ({
+        url: "/admin/candidates/upload-resume",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    importCandidates: builder.mutation<
+      {
+        success: boolean;
+        summary?: { total: number; created: number; duplicate: number; invalid: number };
+        results?: Array<{ index: number; status: string; userId?: string; phone?: string; reason?: string; candidate?: any }>;
+        message?: string;
+      },
+      { candidates: any[] }
+    >({
+      query: (body) => ({
+        url: "/admin/candidates/import",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Admin", "Candidate"],
+    }),
     getAdminApplications: builder.query<any[], { status?: string; page?: number; limit?: number } | void>({
       query: (params) => {
         const queryParams = new URLSearchParams();
@@ -250,6 +273,8 @@ export const {
   useGetAdminEmployersQuery,
   useToggleEmployerStatusMutation,
   useGetAdminCandidatesQuery,
+  useUploadCandidateResumeMutation,
+  useImportCandidatesMutation,
   useGetAdminApplicationsQuery,
   useUpdateAdminApplicationStatusMutation,
   useCreateCategoryMutation,

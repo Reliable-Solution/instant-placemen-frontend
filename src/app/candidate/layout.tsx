@@ -12,6 +12,7 @@ import {
   Briefcase,
   Bookmark,
   ShieldCheck,
+  MessageCircle,
   ArrowLeft,
   LogOut,
   ChevronRight,
@@ -77,7 +78,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   // Gate render until token + role validated (don't render children if invalid)
   if (!mounted || !validated) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div suppressHydrationWarning className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-600 text-sm font-medium">Loading...</p>
@@ -91,6 +92,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
     { label: "My Profile & CV", href: "/candidate/profile", icon: User },
     { label: "Upload Resume", href: "/candidate/resume", icon: Upload },
     { label: "My Applications", href: "/candidate/applications", icon: Briefcase },
+    { label: "Messages", href: "/candidate/messages", icon: MessageCircle },
     { label: "Saved Jobs", href: "/candidate/saved", icon: Bookmark },
     { label: "Privacy & Consent", href: "/candidate/privacy", icon: ShieldCheck },
   ];

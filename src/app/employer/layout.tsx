@@ -14,6 +14,7 @@ import {
   Search,
   Building2,
   CreditCard,
+  MessageCircle,
   Coins,
   ArrowLeft,
   LogOut,
@@ -104,7 +105,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   // Gate render until token + role validated (don't render children if invalid)
   if (!mounted || !validated) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div suppressHydrationWarning className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-600 text-sm font-medium">Loading...</p>
@@ -118,6 +119,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
     { label: "My Job Mandates", href: "/employer/jobs", icon: Briefcase },
     { label: "Post New Job", href: "/employer/jobs/new", icon: PlusCircle },
     { label: "Applicant Pipeline", href: "/employer/applicants", icon: Users },
+    { label: "Messages", href: "/employer/messages", icon: MessageCircle },
     { label: "Candidate Pool", href: "/employer/candidates", icon: Search },
     { label: "Plans & Billing", href: "/employer/plans", icon: CreditCard },
     { label: "Company Profile", href: "/employer/profile", icon: Building2 },

@@ -20,7 +20,6 @@ import {
   CheckCircle2,
   Building2,
   FileText,
-  DollarSign,
   MessageSquare,
   ShieldCheck,
   User,
@@ -89,7 +88,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 !m-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
         {/* ─── Modal Sticky Header ─── */}
         <div className="p-5 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white flex items-start justify-between gap-4 shrink-0">
@@ -107,7 +106,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                   <span>{candidate.name ? candidate.name.charAt(0).toUpperCase() : "C"}</span>
                 )}
               </div>
-              <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full" title="Active Candidate" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 border-2 border-indigo-950 rounded-full shadow-xs" title="Active Candidate" />
             </div>
 
             <div className="space-y-1">
@@ -128,17 +127,23 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                 )}
               </div>
 
-              <p className="text-xs text-blue-200 font-semibold flex items-center gap-2 flex-wrap">
+              <div className="text-xs text-blue-200 font-semibold flex items-center gap-2 flex-wrap pt-0.5">
                 <span className="text-white font-bold">{candidate.currentRole || "Candidate"}</span>
                 {candidate.currentCompany && (
                   <>
-                    <span>•</span>
-                    <span className="text-blue-300">🏢 {candidate.currentCompany}</span>
+                    <span className="text-blue-400/60">•</span>
+                    <span className="flex items-center gap-1 text-blue-300">
+                      <Building2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                      <span>{candidate.currentCompany}</span>
+                    </span>
                   </>
                 )}
-                <span>•</span>
-                <span>📍 {candidate.locality ? `${candidate.locality}, ` : ""}{candidate.city || "Surat"}</span>
-              </p>
+                <span className="text-blue-400/60">•</span>
+                <span className="flex items-center gap-1 text-slate-200">
+                  <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span>{candidate.locality ? `${candidate.locality}, ` : ""}{candidate.city || "Surat"}</span>
+                </span>
+              </div>
 
               {/* Direct Quick Actions */}
               <div className="flex items-center gap-2 pt-2 flex-wrap">
@@ -403,8 +408,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                   <span className="text-xs uppercase font-bold text-slate-500 block mb-1">
                     Expected Monthly Salary
                   </span>
-                  <div className="font-extrabold text-sm text-emerald-700 flex items-center gap-1.5">
-                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                  <div className="font-extrabold text-sm text-emerald-700">
                     <span>
                       {candidate.expectedSalaryMonthly || candidate.expectedSalary
                         ? `₹${Number(candidate.expectedSalaryMonthly || candidate.expectedSalary).toLocaleString("en-IN")} / mo`
