@@ -9,8 +9,6 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
-  Settings,
-  Sparkles,
   Send,
   RefreshCw,
   Plus,
@@ -30,7 +28,6 @@ import {
   ArrowLeft,
   Users,
   Building,
-  Key,
   Copy,
   ExternalLink,
   MessageSquare,
@@ -44,7 +41,6 @@ import {
   DEFAULT_CANDIDATE,
   extractTextFromPdf,
   scrapeCandidateDataFromText,
-  parseWithGemini,
   COMMON_CITIES,
   COMMON_SKILLS,
 } from "@/lib/pdfParser";
@@ -52,6 +48,7 @@ import type { CandidateFormData } from "@/lib/pdfParser";
 import {
   useUploadCandidateResumeMutation,
   useImportCandidatesMutation,
+  useParseResumeWithAiMutation,
 } from "@/services/api/adminApi";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -64,10 +61,9 @@ export default function AddCandidatePage() {
   // RTK Query Mutations
   const [uploadResume, { isLoading: isUploadingResume }] = useUploadCandidateResumeMutation();
   const [importCandidates, { isLoading: isImporting }] = useImportCandidatesMutation();
-
-  // Settings State (for optional Gemini AI enhancement)
-  const [geminiKey, setGeminiKey] = useState<string>("");
-  const [showConfig, setShowConfig] = useState(false);
+  const [parseWithServerAi] = useParseResumeWithAiMutation();
+  const [serverProvider, setServerProvider] = useState<string | null>(null);
+  const [parseNeedsReview, setParseNeedsReview] = useState(false);
 
   // Parsing & File State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -128,17 +124,6 @@ ID: ${rec._id || "N/A"}`;
     setTimeout(() => setCopiedId(false), 2000);
   };
 
-  // Sync Gemini key with localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("ip_gemini_key");
-    if (saved) setGeminiKey(saved);
-  }, []);
-
-  const handleSaveGeminiKey = (key: string) => {
-    setGeminiKey(key);
-    localStorage.setItem("ip_gemini_key", key);
-  };
-
   // PDF Dropzone handler
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -156,29 +141,52 @@ ID: ${rec._id || "N/A"}`;
         const text = await extractTextFromPdf(file);
         setRawText(text);
 
-        let parsed: CandidateFormData;
-        if (geminiKey.trim()) {
-          try {
-            parsed = await parseWithGemini(text, geminiKey.trim());
-            setUsedAiParser(true);
-          } catch (aiErr) {
-            console.warn("Gemini parsing failed, falling back to rule-based parser:", aiErr);
-            parsed = scrapeCandidateDataFromText(text);
-            setUsedAiParser(false);
-          }
-        } else {
-          parsed = scrapeCandidateDataFromText(text);
-          setUsedAiParser(false);
-        }
+        // Instant client-side parse; server AI then upgrades it (client regex
+        // misses spaced Canva text, role titles, degree details, skill lists).
+        const parsed: CandidateFormData = scrapeCandidateDataFromText(text);
+        setUsedAiParser(false);
+        setServerProvider(null);
 
         setCandidateData(parsed);
+
+        // Server AI upgrade (always): backend runs OCR + strong parser + AI chain
+        // (groq -> openrouter -> deepseek -> gemini -> ollama) with result cache.
+        // Same CV twice costs zero tokens. Failures keep the client result.
+        try {
+          const fd = new FormData();
+          fd.append("file", file);
+          const serverRes = await parseWithServerAi(fd).unwrap();
+          if (serverRes?.success && serverRes.candidate) {
+              setCandidateData((prev) => ({ ...prev, ...serverRes.candidate }));
+              setUsedAiParser(serverRes.provider !== "regex");
+              setParseNeedsReview(!!serverRes.needsReview);
+              setServerProvider(
+                serverRes.provider
+                  ? `${serverRes.provider}${serverRes.cached ? " (cached, 0 tokens)" : ""}`
+                  : null
+              );
+              if (serverRes.manualReview) {
+                setParseError(
+                  "All AI providers failed - regex result below. Please review/edit every field manually before saving."
+                );
+              } else if (serverRes.needsReview) {
+                setParseError(
+                  (prev) =>
+                    prev ||
+                    "Low-confidence extraction - please review every field before saving."
+                );
+              }
+            }
+          } catch (serverErr) {
+            console.warn("Server AI parse unavailable, keeping client result:", serverErr);
+          }
       } catch (err: any) {
         setParseError(err?.message || "Failed to read or parse PDF file.");
       } finally {
         setIsParsing(false);
       }
     },
-    [geminiKey]
+    [parseWithServerAi]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -189,6 +197,39 @@ ID: ${rec._id || "N/A"}`;
 
   const updateField = (field: keyof CandidateFormData, value: any) => {
     setCandidateData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Single experience input -> tier derived automatically (no double fields)
+  const experienceTierForYears = (yrs: number): string => {
+    if (!yrs || yrs <= 0) return "Fresher";
+    if (yrs < 1) return "Less than 1 Year";
+    if (yrs < 3) return "1-3 Years";
+    if (yrs < 5) return "3-5 Years";
+    return "5+ Years";
+  };
+
+  const handleYearsChange = (yrs: number) => {
+    const safe = Number.isFinite(yrs) && yrs >= 0 ? Math.min(40, yrs) : 0;
+    setCandidateData((prev) => ({ ...prev, totalExperienceYears: safe, experience: experienceTierForYears(safe) }));
+  };
+
+  // Single qualification input -> tier derived automatically (no double fields)
+  const qualificationTierForDegree = (degree: string): string => {
+    const d = degree.toLowerCase();
+    if (/mba|mca|m\.?tech|m\.?sc|m\.?com|post graduate|master|phd|master\s*of\s*business\s*administration|master\s*of\s*computer\s*applications|master\s*of\s*commerce|master\s*of\s*science/.test(d)) return "Post Graduate";
+    if (/b\.?tech|b\.?e\b|bca|b\.?sc|b\.?com|bba|graduate|bachelor|b\.?pharm|llb|bachelor\s*of\s*business\s*administration|bachelor\s*of\s*computer\s*applications|bachelor\s*of\s*commerce|bachelor\s*of\s*science|bachelor\s*of\s*technology/.test(d)) return "Graduate";
+    if (/diploma|iti/.test(d)) return "Diploma";
+    if (/12th|hsc|higher secondary/.test(d)) return "12th Pass";
+    if (/10th|ssc/.test(d)) return "10th Pass";
+    return "12th Pass";
+  };
+
+  const handleDegreeChange = (degree: string) => {
+    setCandidateData((prev) => ({
+      ...prev,
+      qualificationDetail: degree,
+      qualification: degree.trim() ? qualificationTierForDegree(degree) : prev.qualification,
+    }));
   };
 
   const handleAddSkill = (skillToAdd?: string) => {
@@ -215,6 +256,8 @@ ID: ${rec._id || "N/A"}`;
     setSubmitSuccess(null);
     setImportedRecord(null);
     setUsedAiParser(false);
+    setServerProvider(null);
+    setParseNeedsReview(false);
     setShowEditForm(false);
   };
 
@@ -287,6 +330,7 @@ ID: ${rec._id || "N/A"}`;
           _id: resultItem?.userId || returnedCandidate?._id || returnedCandidate?.id,
           status: resultItem?.status || (isDuplicate ? "duplicate" : "created"),
           reason: resultItem?.reason,
+          needsReview: returnedCandidate?.needsReview ?? parseNeedsReview ?? false,
           resumeUrl:
             returnedCandidate?.resumeUrl ||
             (uploadedResumeFilename ? `/api/v1/resumes/file/${uploadedResumeFilename}` : undefined),
@@ -335,18 +379,12 @@ ID: ${rec._id || "N/A"}`;
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={() => setShowConfig(!showConfig)}
-            className={`px-3 py-2 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-colors ${
-              showConfig || geminiKey
-                ? "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
-                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-            }`}
+          <Link
+            href="/admin/aiparser"
+            className="px-3 py-2 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-            <span>{geminiKey ? "AI Parser Enabled" : "Configure AI Parser"}</span>
-          </button>
+            <span>AI Parser Settings</span>
+          </Link>
 
           <button
             type="button"
@@ -358,50 +396,6 @@ ID: ${rec._id || "N/A"}`;
           </button>
         </div>
       </div>
-
-      {/* Optional Gemini AI Key Drawer */}
-      {showConfig && (
-        <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <h2 className="text-xs font-extrabold text-purple-900 uppercase tracking-wider">
-                Gemini AI Parser Settings (Optional)
-              </h2>
-            </div>
-            <button
-              onClick={() => setShowConfig(false)}
-              className="text-slate-400 hover:text-slate-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <p className="text-xs text-purple-700">
-            By default, resumes are extracted instantly for free using our built-in client-side regex ATS parser. If you provide a Google Gemini API Key, it will also use AI to detect nuanced experience, skills, and summary.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
-            <div className="relative flex-1">
-              <Key className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <Input
-                type="password"
-                placeholder="AIzaSy..."
-                value={geminiKey}
-                onChange={(e) => handleSaveGeminiKey(e.target.value)}
-                className="pl-9 h-9 text-xs bg-white"
-              />
-            </div>
-            {geminiKey && (
-              <button
-                type="button"
-                onClick={() => handleSaveGeminiKey("")}
-                className="px-3 py-1.5 text-xs text-rose-600 hover:text-rose-700 font-bold"
-              >
-                Remove Key
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* ─── IMPORTED CANDIDATE CONFIRMATION & DOSSIER VIEW ─── */}
       {submitSuccess && importedRecord && !showEditForm ? (
@@ -445,6 +439,11 @@ ID: ${rec._id || "N/A"}`;
                     >
                       {importedRecord.status === "duplicate" ? "Duplicate Record" : "Active in Talent Pool"}
                     </span>
+                      {importedRecord.needsReview && (
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border bg-amber-100 text-amber-800 border-amber-300">
+                          Needs review - verify role & details
+                        </span>
+                      )}
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
                     {importedRecord.status === "duplicate"
@@ -974,7 +973,7 @@ ID: ${rec._id || "N/A"}`;
               </span>
               {usedAiParser && (
                 <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-[10px]">
-                  Parsed by Gemini
+                  {serverProvider ? `Parsed by ${serverProvider}` : "Parsed by Gemini"}
                 </Badge>
               )}
             </div>
@@ -1196,98 +1195,44 @@ ID: ${rec._id || "N/A"}`;
                 />
               </div>
 
-              {/* Experience Level */}
+              {/* Experience: single input, tier auto-derived */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Experience Tier</label>
-                <select
-                  value={candidateData.experience}
-                  onChange={(e) => updateField("experience", e.target.value)}
-                  className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
-                  <option value="Fresher">Fresher (0 years)</option>
-                  <option value="Less than 1 Year">Less than 1 Year</option>
-                  <option value="1-3 Years">1 - 3 Years</option>
-                  <option value="3-5 Years">3 - 5 Years</option>
-                  <option value="5+ Years">5+ Years</option>
-                </select>
+                <label className="text-xs font-bold text-slate-700">Total Experience (Years)</label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={40}
+                    step={0.5}
+                    placeholder="e.g. 2"
+                    value={candidateData.totalExperienceYears}
+                    onChange={(e) => handleYearsChange(Number(e.target.value))}
+                    className="h-10 text-xs"
+                  />
+                  <span className="inline-flex items-center px-3 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl whitespace-nowrap">
+                    {candidateData.experience}
+                  </span>
+                </div>
               </div>
 
-              {/* Total Experience in Years */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Total Years</label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={40}
-                  value={candidateData.totalExperienceYears}
-                  onChange={(e) => updateField("totalExperienceYears", Number(e.target.value))}
-                  className="h-10 text-xs"
-                />
-              </div>
-
-              {/* Qualification */}
+              {/* Qualification: single input, tier auto-derived */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Qualification Tier</span>
+                  <span>Qualification (Degree / Stream)</span>
                 </label>
-                <select
-                  value={candidateData.qualification}
-                  onChange={(e) => updateField("qualification", e.target.value)}
-                  className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
-                  <option value="10th Pass">10th Pass</option>
-                  <option value="12th Pass">12th Pass</option>
-                  <option value="Diploma">Diploma</option>
-                  <option value="Graduate">Graduate</option>
-                  <option value="Post Graduate">Post Graduate</option>
-                </select>
-              </div>
-
-              {/* Qualification Detail */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Degree / Stream</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. B.Com, BCA, B.Tech CS"
-                  value={candidateData.qualificationDetail}
-                  onChange={(e) => updateField("qualificationDetail", e.target.value)}
-                  className="h-10 text-xs"
-                />
-              </div>
-
-              {/* Expected Monthly Salary */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <IndianRupee className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Expected Monthly Salary (₹)</span>
-                </label>
-                <Input
-                  type="number"
-                  min={0}
-                  step={1000}
-                  value={candidateData.expectedSalaryMonthly}
-                  onChange={(e) => updateField("expectedSalaryMonthly", Number(e.target.value))}
-                  className="h-10 text-xs"
-                />
-              </div>
-
-              {/* Notice Period */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Notice Period</span>
-                </label>
-                <select
-                  value={candidateData.noticePeriod}
-                  onChange={(e) => updateField("noticePeriod", e.target.value as any)}
-                  className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
-                  <option value="IMMEDIATE">Immediate Joiner</option>
-                  <option value="15_DAYS">15 Days</option>
-                  <option value="30_DAYS">30 Days</option>
-                  <option value="SERVING_NOTICE">Serving Notice</option>
-                </select>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="e.g. BCA, B.Com, B.Tech CS, 12th"
+                    value={candidateData.qualificationDetail}
+                    onChange={(e) => handleDegreeChange(e.target.value)}
+                    className="h-10 text-xs"
+                  />
+                  <span className="inline-flex items-center px-3 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-xl whitespace-nowrap">
+                    {candidateData.qualification}
+                  </span>
+                </div>
               </div>
             </div>
 
