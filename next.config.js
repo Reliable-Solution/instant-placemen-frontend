@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    allowedDevOrigins: [
+    "*.trycloudflare.com",
+  ],
   output: "standalone",
   reactStrictMode: true,
   images: {

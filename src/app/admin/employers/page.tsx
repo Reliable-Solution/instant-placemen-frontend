@@ -42,11 +42,16 @@ export default function AdminEmployersPage() {
     setCurrentPage(1);
   }, [search, activeTab]);
 
-  const { data: employers = [], isLoading, refetch } = useGetAdminEmployersQuery({
-    search: search || undefined,
-    page: currentPage,
-    limit: PAGE_SIZE,
-  });
+  const { data: employers = [], isLoading, refetch } = useGetAdminEmployersQuery(
+    {
+      search: search || undefined,
+      page: currentPage,
+      limit: PAGE_SIZE,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const employerList = Array.isArray(employers) ? employers : (employers as any).data || [];
   const totalEmployers = (employers as any).total ?? employerList.length;
@@ -79,7 +84,10 @@ export default function AdminEmployersPage() {
     setRejectionReason("");
   };
 
-  const filtered = employerList;
+  const unverifiedCount = employerList.filter((emp: any) => !emp.verifiedCompany).length;
+  const filtered = activeTab === "verification"
+    ? employerList.filter((emp: any) => !emp.verifiedCompany)
+    : employerList;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
@@ -122,7 +130,7 @@ export default function AdminEmployersPage() {
             <Clock className="w-3.5 h-3.5 text-amber-500" />
             <span>Verification Queue</span>
             <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center">
-              2
+              {unverifiedCount}
             </span>
           </button>
         </div>

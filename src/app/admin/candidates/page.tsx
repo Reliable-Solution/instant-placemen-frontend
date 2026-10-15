@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetAdminCandidatesQuery } from "@/services/api/adminApi";
+import { useGetAdminCandidatesQuery, useDeleteAdminUserMutation } from "@/services/api/adminApi";
 import { useGetCandidateCitiesQuery } from "@/services/api/candidateApi";
 import Link from "next/link";
 import {
@@ -17,6 +17,7 @@ import {
   Eye,
   ExternalLink,
   UserPlus,
+  Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,9 @@ export default function AdminCandidatesPage() {
   const [cityFilter, setCityFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteAdminUserMutation();
   const PAGE_SIZE = 12;
 
   React.useEffect(() => {
@@ -45,6 +49,36 @@ export default function AdminCandidatesPage() {
 
   const totalCandidates = (candidates as any).total ?? candidates.length;
   const totalPages = (candidates as any).totalPages ?? 1;
+
+  // Two-step delete: first click arms, second click deletes.
+  const handleDeleteClick = async (e: React.MouseEvent, c: any) => {
+    e.stopPropagation();
+    const id = c._id || c.id;
+    if (!id) return;
+    if (confirmDeleteId !== id) {
+      setConfirmDeleteId(id);
+      setDeleteError(null);
+      setTimeout(() => {
+        setConfirmDeleteId((cur) => (cur === id ? null : cur));
+      }, 4000);
+      return;
+    }
+    try {
+      const res = await deleteUser(id).unwrap();
+      if (res?.success) {
+        setConfirmDeleteId(null);
+        if (selectedCandidate && (selectedCandidate._id === id || selectedCandidate.id === id)) {
+          setSelectedCandidate(null);
+        }
+      } else {
+        setDeleteError(res?.message || "Delete failed.");
+        setConfirmDeleteId(null);
+      }
+    } catch (err: any) {
+      setDeleteError(err?.data?.message || err?.message || "Delete failed.");
+      setConfirmDeleteId(null);
+    }
+  };
 
   return (
     <>
@@ -98,6 +132,13 @@ export default function AdminCandidatesPage() {
           </span>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center justify-between">
+          <span>{deleteError}</span>
+          <button onClick={() => setDeleteError(null)} className="text-rose-500 hover:text-rose-700 font-bold">Dismiss</button>
+        </div>
+      )}
 
       {/* Candidate Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -205,6 +246,20 @@ export default function AdminCandidatesPage() {
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Full Profile</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handleDeleteClick(e, c)}
+                  disabled={isDeleting}
+                  title={confirmDeleteId === (c._id || c.id) ? "Click again to confirm delete" : "Delete candidate"}
+                  className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50 ${
+                    confirmDeleteId === (c._id || c.id)
+                      ? "text-white bg-rose-600 hover:bg-rose-700"
+                      : "text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100"
+                  }`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{confirmDeleteId === (c._id || c.id) ? "Confirm?" : "Delete"}</span>
                 </button>
               </div>
             </div>
