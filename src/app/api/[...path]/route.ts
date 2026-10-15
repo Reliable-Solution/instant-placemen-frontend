@@ -6,7 +6,7 @@ async function proxyRequest(request: NextRequest) {
   const url = new URL(request.url);
   const backendBase =
     process.env.BACKEND_INTERNAL_URL ||
-    (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost")
+    (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost") && !process.env.NEXT_PUBLIC_API_URL.startsWith("/")
       ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
       : process.env.NODE_ENV === "production"
       ? "https://api.instantplacement.in"

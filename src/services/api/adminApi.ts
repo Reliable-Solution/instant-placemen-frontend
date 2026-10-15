@@ -134,6 +134,35 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Admin", "Candidate"],
     }),
+    deleteAdminUser: builder.mutation<{ success: boolean; message?: string }, string>({
+      // ADMIN-only candidate delete (backend blocks self-delete + audit-logs it).
+      query: (id) => ({
+        url: `/admin/users/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Admin", "Candidate"],
+    }),
+    getAiParserConfig: builder.query<{ success: boolean; config?: any }, void>({
+      query: () => "/admin/aiparser/config",
+      providesTags: ["Admin"],
+    }),    updateAiParserConfig: builder.mutation<{ success: boolean; message?: string }, any>({
+      query: (body) => ({
+        url: "/admin/aiparser/config",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    parseResumeWithAi: builder.mutation<
+      { success: boolean; provider?: string; keyIndex?: number; needsReview?: boolean; textLength?: number; candidate?: any; message?: string; cached?: boolean; manualReview?: boolean },
+      FormData
+    >({
+      query: (formData) => ({
+        url: "/admin/aiparser/parse",
+        method: "POST",
+        body: formData,
+      }),
+    }),
     getAdminApplications: builder.query<any[], { status?: string; page?: number; limit?: number } | void>({
       query: (params) => {
         const queryParams = new URLSearchParams();
@@ -253,8 +282,7 @@ export const adminApi = baseApi.injectEndpoints({
         body: { jobId },
       }),
     }),
-    getAdminSubscriptions: builder.query<{ success: boolean; subscriptions: any[]; pending: any[]; failed: any[] }, { status?: string } | void>({
-      query: (params) => {
+    getAdminSubscriptions: builder.query<{ success: boolean; subscriptions: any[]; pending: any[]; failed: any[] }, { status?: string } | void>({      query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.status) queryParams.set("status", params.status);
         return `/admin/subscriptions?${queryParams.toString()}`;
@@ -273,6 +301,7 @@ export const {
   useGetAdminEmployersQuery,
   useToggleEmployerStatusMutation,
   useGetAdminCandidatesQuery,
+  useDeleteAdminUserMutation,
   useUploadCandidateResumeMutation,
   useImportCandidatesMutation,
   useGetAdminApplicationsQuery,
@@ -290,6 +319,9 @@ export const {
   useToggleArchivePlanMutation,
   useSendCandidateJobAlertMutation,
   useGetAdminSubscriptionsQuery,
+  useGetAiParserConfigQuery,
+  useUpdateAiParserConfigMutation,
+  useParseResumeWithAiMutation,
 } = adminApi;
 
 

@@ -28,9 +28,12 @@ interface AuthState {
 // Helper to decode JWT token (without verification - for client-side role check)
 const decodeToken = (token: string): { id?: string; role?: string; exp?: number } | null => {
   try {
-    const base64Url = token.split(".")[1];
-    if (!base64Url) return null;
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) {
+      base64 += "=";
+    }
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
@@ -39,7 +42,13 @@ const decodeToken = (token: string): { id?: string; role?: string; exp?: number 
     );
     return JSON.parse(jsonPayload);
   } catch {
-    return null;
+    try {
+      let base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      while (base64.length % 4) base64 += "=";
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
+    }
   }
 };
 

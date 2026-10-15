@@ -164,9 +164,9 @@ export function scrapeCandidateDataFromText(rawText: string): CandidateFormData 
 
   // 7. Qualification
   let qualification = '12th Pass';
-  if (/m\.tech|mba|mca|m\.sc|m\.com|post graduate|master/i.test(text)) {
+  if (/m\.tech|mba|mca|m\.sc|m\.com|post graduate|master|phd|master\s*of\s*business\s*administration|master\s*of\s*computer\s*applications|master\s*of\s*commerce|master\s*of\s*science/i.test(text)) {
     qualification = 'Post Graduate';
-  } else if (/b\.tech|b\.e\.|bca|b\.sc|b\.com|bba|graduate|bachelor/i.test(text)) {
+  } else if (/b\.tech|b\.e\.|bca|b\.sc|b\.com|bba|graduate|bachelor|bachelor\s*of\s*business\s*administration|bachelor\s*of\s*computer\s*applications|bachelor\s*of\s*commerce|bachelor\s*of\s*science|bachelor\s*of\s*technology/i.test(text)) {
     qualification = 'Graduate';
   } else if (/diploma/i.test(text)) {
     qualification = 'Diploma';
