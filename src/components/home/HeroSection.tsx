@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   ArrowRight,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 
 interface HeroSectionProps {
@@ -17,6 +18,7 @@ interface HeroSectionProps {
   onSearchChange: (query: string) => void;
   onSearchSubmit: () => void;
   onQuickPillClick: (tag: string) => void;
+  isLoadingJobs?: boolean;
 }
 
 const POPULAR_TAGS = [
@@ -37,8 +39,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onSearchChange,
   onSearchSubmit,
   onQuickPillClick,
+  isLoadingJobs = false,
 }) => {
   const [localRole, setLocalRole] = useState(searchQuery);
+  const [activePill, setActivePill] = useState<string | null>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -145,20 +149,31 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <span className="text-blue-200 font-semibold flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5 text-amber-300" /> Popular Searches:
           </span>
-          {POPULAR_TAGS.map((tag) => (
-            <button
-              key={tag.label}
-              onClick={() => {
-                setLocalRole(tag.query);
-                onSearchChange(tag.query);
-                onQuickPillClick(tag.query);
-              }}
-              className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-full font-medium transition-all backdrop-blur-sm flex items-center gap-1.5 active:scale-95"
-            >
-              <span>{tag.icon}</span>
-              <span>{tag.label}</span>
-            </button>
-          ))}
+          {POPULAR_TAGS.map((tag) => {
+            const isThisLoading = isLoadingJobs && activePill === tag.query;
+            return (
+              <button
+                key={tag.label}
+                disabled={isLoadingJobs}
+                onClick={() => {
+                  setActivePill(tag.query);
+                  setLocalRole(tag.query);
+                  onSearchChange(tag.query);
+                  onQuickPillClick(tag.query);
+                }}
+                className={`bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-full font-medium transition-all backdrop-blur-sm flex items-center gap-1.5 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+                  isThisLoading ? "bg-white/25 ring-2 ring-amber-300" : ""
+                }`}
+              >
+                {isThisLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-300" />
+                ) : (
+                  <span>{tag.icon}</span>
+                )}
+                <span>{tag.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>

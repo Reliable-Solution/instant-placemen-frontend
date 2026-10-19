@@ -253,7 +253,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
   return (
     <div
-      className={`relative flex h-full flex-col rounded-2xl border-2 bg-white p-6 pt-7 transition-colors duration-200 ${cardBorder} ${
+      className={`relative flex h-full flex-col rounded-2xl border-2 bg-white p-6 pt-7 transition-colors duration-200 min-w-0 ${cardBorder} ${
         highlighted ? "shadow-lg shadow-blue-900/5" : "shadow-sm"
       }`}
     >
@@ -278,19 +278,25 @@ const PricingCard: React.FC<PricingCardProps> = ({
         </div>
       </div>
 
-      <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-      <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
+      <h3 className="text-lg font-bold text-slate-900 break-words leading-snug">{title}</h3>
+      <p className="mt-0.5 text-sm text-slate-500 break-words leading-relaxed">{subtitle}</p>
 
       {/* Price */}
-      <div className="mb-5 mt-4 border-b border-slate-100 pb-4">
-        <span className="text-2xl font-bold text-slate-900">{price}</span>
-        <span className="ml-1 text-xs text-slate-500">{priceUnit}</span>
+      <div className="mb-5 mt-4 border-b border-slate-100 pb-4 min-w-0">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
+          <span className={`font-black tracking-tight text-slate-900 break-words leading-tight ${
+            price && price.length > 10 ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"
+          }`}>
+            {price}
+          </span>
+          <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">{priceUnit}</span>
+        </div>
       </div>
 
       {calloutText && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800">
-          <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />
-          {calloutText}
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800 min-w-0">
+          <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
+          <span className="break-words leading-snug">{calloutText}</span>
         </div>
       )}
 

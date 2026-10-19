@@ -24,6 +24,7 @@ import { getApiBaseUrl } from "@/lib/config";
 import { SegmentedOTPInput } from "@/components/ui/SegmentedOTPInput";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
+import { toast } from "@/components/ui/toast";
 
 interface CandidateAuthModalProps {
   isOpen: boolean;
@@ -86,7 +87,9 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
 
     const cleanPhone = phone.replace(/\D/g, "").slice(-10);
     if (!isValidPhone(cleanPhone)) {
-      setErrorMessage("Please enter a valid 10-digit Indian mobile number (starts with 6-9)");
+      const msg = "Please enter a valid 10-digit Indian mobile number (starts with 6-9)";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -98,9 +101,25 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
         body: JSON.stringify({ phone: cleanPhone }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        const msg = text || `Server error (${res.status}). Please check API connectivity.`;
+        setErrorMessage(msg);
+        toast.error(msg);
+        setLoading(false);
+        return;
+      }
+
       if (!res.ok || !data.success) {
-        setErrorMessage(data.message || "Failed to send OTP. Please check your number and try again.");
+        const msg = Array.isArray(data.errors) && data.errors.length > 0
+          ? data.errors.map((e: any) => typeof e === "string" ? e : e.msg || e.message).join(". ")
+          : data.message || data.error?.message || "Failed to send OTP. Please check your number and try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
         if (data.retryAfter) {
           setResendCooldown(data.retryAfter);
         }
@@ -108,12 +127,16 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
         return;
       }
 
-      setSuccessMessage(`OTP sent to WhatsApp (+91 ${cleanPhone})`);
+      const successMsg = data.message || `OTP sent to WhatsApp (+91 ${cleanPhone})`;
+      setSuccessMessage(successMsg);
+      toast.success(successMsg);
       setStep("otp");
       setResendCooldown(120);
     } catch (err: any) {
       console.error("Error sending OTP:", err);
-      setErrorMessage("Network error connecting to authentication server. Please try again.");
+      const msg = err?.message || "Network error connecting to authentication server. Please try again.";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -125,7 +148,9 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
 
     const cleanOtp = otp.trim();
     if (cleanOtp.length !== 6) {
-      setErrorMessage("Please enter the complete 6-digit OTP received on WhatsApp");
+      const msg = "Please enter the complete 6-digit OTP received on WhatsApp";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -139,31 +164,62 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
         body: JSON.stringify({ phone: cleanPhone, otp: cleanOtp }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        const msg = text || `Server error (${res.status}). Please check API connectivity.`;
+        setErrorMessage(msg);
+        toast.error(msg);
+        setLoading(false);
+        return;
+      }
+
       if (!res.ok || !data.success) {
-        setErrorMessage(data.message || "Invalid or expired OTP. Please try again.");
+        const msg = Array.isArray(data.errors) && data.errors.length > 0
+          ? data.errors.map((e: any) => typeof e === "string" ? e : e.msg || e.message).join(". ")
+          : data.message || data.error?.message || "Invalid or expired OTP. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
         setLoading(false);
         return;
       }
 
-      if (data.user && data.user.role !== "CANDIDATE") {
-        setErrorMessage(`This mobile number is registered as an ${data.user.role} account. Please sign in via the ${data.user.role.toLowerCase()} portal.`);
+      const userData = data.data?.user || data.user;
+      const token = data.data?.token || data.token;
+
+      if (!userData || !token) {
+        const msg = "Unexpected server response. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
         setLoading(false);
         return;
       }
 
-      if (data.token) localStorage.setItem("ip_token", data.token);
-      if (data.user) {
-        localStorage.setItem("ip_user", JSON.stringify(data.user));
-        dispatch(setUser(data.user));
-        onLoginSuccess(data.user);
+      if (userData.role && userData.role !== "CANDIDATE") {
+        const msg = `This mobile number is registered as an ${userData.role} account. Please sign in via the ${userData.role.toLowerCase()} portal.`;
+        setErrorMessage(msg);
+        toast.error(msg);
+        setLoading(false);
+        return;
       }
 
+      const userWithToken = { ...userData, token };
+      localStorage.setItem("ip_token", token);
+      localStorage.setItem("ip_user", JSON.stringify(userWithToken));
+      dispatch(setUser(userWithToken));
+      onLoginSuccess(userWithToken);
+
+      toast.success(data.message || `Welcome back, ${userData.name || "Candidate"}! Login successful.`);
       resetModal();
       onClose();
     } catch (err: any) {
       console.error("OTP verification error:", err);
-      setErrorMessage("Unable to verify OTP right now. Please try again.");
+      const msg = err?.message || "Unable to verify OTP right now. Please try again.";
+      setErrorMessage(msg);
+      toast.error(msg);
       setLoading(false);
     }
   };
@@ -176,25 +232,33 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
 
     const cleanEmail = email.trim().toLowerCase();
     if (!isValidEmail(cleanEmail)) {
-      setErrorMessage("Please enter a valid email address (e.g. name@example.com)");
+      const msg = "Please enter a valid email address (e.g. name@example.com)";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     if (!password || password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters long");
+      const msg = "Password must be at least 6 characters long";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     if (isSignUp) {
       // Validate Sign Up Specific Fields
       if (!name.trim() || name.trim().length < 2) {
-        setErrorMessage("Please enter your full name (minimum 2 characters)");
+        const msg = "Please enter your full name (minimum 2 characters)";
+        setErrorMessage(msg);
+        toast.error(msg);
         return;
       }
 
       const cleanPhone = signupPhone.replace(/\D/g, "").slice(-10);
       if (!isValidPhone(cleanPhone)) {
-        setErrorMessage("Please enter a valid 10-digit Indian phone number (starts with 6-9)");
+        const msg = "Please enter a valid 10-digit Indian phone number (starts with 6-9)";
+        setErrorMessage(msg);
+        toast.error(msg);
         return;
       }
 
@@ -212,25 +276,54 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
           }),
         });
 
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          setErrorMessage(data.message || "Registration failed. An account with this email or phone may already exist.");
+        let data: any = {};
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          const msg = text || `Server error (${res.status}). Please check API connectivity.`;
+          setErrorMessage(msg);
+          toast.error(msg);
           setLoading(false);
           return;
         }
 
-        if (data.token) localStorage.setItem("ip_token", data.token);
-        if (data.user) {
-          localStorage.setItem("ip_user", JSON.stringify(data.user));
-          dispatch(setUser(data.user));
-          onLoginSuccess(data.user);
+        if (!res.ok || !data.success) {
+          const msg = Array.isArray(data.errors) && data.errors.length > 0
+            ? data.errors.map((e: any) => typeof e === "string" ? e : e.msg || e.message).join(". ")
+            : data.message || data.error?.message || "Registration failed. An account with this email or phone may already exist.";
+          setErrorMessage(msg);
+          toast.error(msg);
+          setLoading(false);
+          return;
         }
 
+        const userData = data.data?.user || data.user;
+        const token = data.data?.token || data.token;
+
+        if (!userData || !token) {
+          const msg = "Unexpected server response. Please try again.";
+          setErrorMessage(msg);
+          toast.error(msg);
+          setLoading(false);
+          return;
+        }
+
+        const userWithToken = { ...userData, token };
+        localStorage.setItem("ip_token", token);
+        localStorage.setItem("ip_user", JSON.stringify(userWithToken));
+        dispatch(setUser(userWithToken));
+        onLoginSuccess(userWithToken);
+
+        toast.success(data.message || `Welcome to Instant Placement, ${userData.name || "Candidate"}! Account created successfully.`);
         resetModal();
         onClose();
       } catch (err: any) {
         console.error("Sign up error:", err);
-        setErrorMessage("Network error during registration. Please try again.");
+        const msg = err?.message || "Network error during registration. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
         setLoading(false);
       }
     } else {
@@ -247,31 +340,62 @@ export const CandidateAuthModal: React.FC<CandidateAuthModalProps> = ({
           }),
         });
 
-        const data = await res.json();
+        let data: any = {};
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          const msg = text || `Server error (${res.status}). Please check API connectivity.`;
+          setErrorMessage(msg);
+          toast.error(msg);
+          setLoading(false);
+          return;
+        }
+
         if (!res.ok || !data.success) {
-          setErrorMessage(data.message || "Invalid email or password. Please verify your credentials.");
+          const msg = Array.isArray(data.errors) && data.errors.length > 0
+            ? data.errors.map((e: any) => typeof e === "string" ? e : e.msg || e.message).join(". ")
+            : data.message || data.error?.message || "Invalid email or password. Please verify your credentials.";
+          setErrorMessage(msg);
+          toast.error(msg);
           setLoading(false);
           return;
         }
 
-        if (data.user && data.user.role !== "CANDIDATE") {
-          setErrorMessage(`This account is registered as ${data.user.role}. Please log in via the ${data.user.role.toLowerCase()} portal.`);
+        const userData = data.data?.user || data.user;
+        const token = data.data?.token || data.token;
+
+        if (!userData || !token) {
+          const msg = "Unexpected server response. Please try again.";
+          setErrorMessage(msg);
+          toast.error(msg);
           setLoading(false);
           return;
         }
 
-        if (data.token) localStorage.setItem("ip_token", data.token);
-        if (data.user) {
-          localStorage.setItem("ip_user", JSON.stringify(data.user));
-          dispatch(setUser(data.user));
-          onLoginSuccess(data.user);
+        if (userData.role && userData.role !== "CANDIDATE") {
+          const msg = `This account is registered as ${userData.role}. Please log in via the ${userData.role.toLowerCase()} portal.`;
+          setErrorMessage(msg);
+          toast.error(msg);
+          setLoading(false);
+          return;
         }
 
+        const userWithToken = { ...userData, token };
+        localStorage.setItem("ip_token", token);
+        localStorage.setItem("ip_user", JSON.stringify(userWithToken));
+        dispatch(setUser(userWithToken));
+        onLoginSuccess(userWithToken);
+
+        toast.success(data.message || `Welcome back, ${userData.name || "Candidate"}! Login successful.`);
         resetModal();
         onClose();
       } catch (err: any) {
         console.error("Login error:", err);
-        setErrorMessage("Network error during login. Please try again.");
+        const msg = err?.message || "Network error during login. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
         setLoading(false);
       }
     }

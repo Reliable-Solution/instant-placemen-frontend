@@ -160,7 +160,7 @@ export default function CandidateSavedJobsPage() {
         </div>
       ) : (
         /* Saved Jobs Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {savedJobs.map((job) => (
             <div
               key={job.id}
@@ -169,15 +169,15 @@ export default function CandidateSavedJobsPage() {
               <div>
                 {/* Top Row: Match Pill + Remove Action */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {job.matchScore && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1 shrink-0 whitespace-nowrap">
                         <Sparkles className="w-3 h-3 text-purple-600" />
                         {job.matchScore}% match
                       </span>
                     )}
                     {job.isUrgent && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1 shrink-0 whitespace-nowrap">
                         <Zap className="w-3 h-3 text-amber-600" />
                         Urgent
                       </span>
@@ -186,7 +186,7 @@ export default function CandidateSavedJobsPage() {
                   <button
                     onClick={() => handleRemove(job.id)}
                     title="Remove from saved"
-                    className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -194,45 +194,53 @@ export default function CandidateSavedJobsPage() {
 
                 {/* Title & Company */}
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center shrink-0 border border-indigo-200/70 shadow-2xs">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-700 font-black text-sm sm:text-base flex items-center justify-center shrink-0 border border-indigo-200/70 shadow-2xs">
                     {job.company.charAt(0)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors line-clamp-1">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors line-clamp-2">
                       {job.title}
                     </h2>
-                    <p className="text-xs text-slate-600 font-semibold truncate mt-0.5">
+                    <p className="text-xs sm:text-sm text-slate-600 font-semibold truncate mt-0.5">
                       {job.company}
                     </p>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                      <span>{job.locality ? `${job.locality}, ` : ""}{job.city}</span>
+                      <span className="truncate">{job.locality ? `${job.locality}, ` : ""}{job.city}</span>
                     </p>
                   </div>
                 </div>
 
-                {/* Salary Info */}
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 mb-4 flex items-center justify-between">
-                  <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
-                    Offered Salary
-                  </span>
-                  <span className="text-xs font-black text-slate-900">
+                {/* Salary Info (Stacked to prevent squishing/truncation on tablet/mobile) */}
+                <div className="p-3 bg-gradient-to-br from-slate-50 to-indigo-50/40 rounded-xl border border-slate-200/80 mb-4">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 tracking-wider">
+                      Offered Salary
+                    </span>
+                    {job.savedAt && (
+                      <span className="text-[11px] text-slate-500 font-medium shrink-0">
+                        {job.savedAt}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
                     {job.salary || "₹18,000 - ₹22,000/mo"}
-                  </span>
+                  </div>
                 </div>
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
                 <Link
                   href={`/job/${job.id}`}
-                  className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl text-center shadow-xs transition-colors"
+                  className="flex-1 h-10 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                 >
-                  Apply Now
+                  <span>Apply Now</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
                   href={`/job/${job.id}`}
-                  className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"
+                  className="h-10 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:scale-[0.99] rounded-xl transition-colors border border-slate-200 flex items-center justify-center"
                   title="View details"
                 >
                   <ExternalLink className="w-4 h-4" />
