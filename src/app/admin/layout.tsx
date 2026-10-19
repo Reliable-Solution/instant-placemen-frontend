@@ -25,9 +25,11 @@ import {
   HelpCircle,
   Settings,
   MessageSquare,
+  Bot,
   UserPlus,
   Receipt,
   PhoneCall,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -141,6 +143,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         },
         { label: "ATS Applications", href: "/admin/applications", icon: FileText },
         { label: "Operations Pipeline", href: "/admin/pipeline", icon: GitBranch },
+        {
+          label: "Daily Reports",
+          href: "/admin/reports",
+          icon: FileSpreadsheet,
+          badge: "DSR",
+        },
       ],
     },
     {
@@ -171,6 +179,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ],
         },
         { label: "FAQ Management", href: "/admin/faqs", icon: HelpCircle },
+        { label: "AI Resume Parser", href: "/admin/aiparser", icon: Bot },
         { label: "Site Settings", href: "/admin/settings", icon: Settings },
       ],
     },
@@ -268,9 +277,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
-        Skip to main content
-      </a>
       {/* Mobile Topbar: Sticky at the top */}
       <header className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
         <Link href="/" className="flex items-center gap-2">
