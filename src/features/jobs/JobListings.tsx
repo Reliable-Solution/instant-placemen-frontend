@@ -14,6 +14,7 @@ import {
   MapPin,
   Briefcase,
   ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 
@@ -175,7 +176,7 @@ export const JobListings: React.FC<JobListingsProps> = ({
             <select
               value={selectedExp}
               onChange={(e) => setSelectedExp(e.target.value)}
-              className="text-xs h-9 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 font-medium focus:outline-none"
+              className="text-xs h-9 pl-3 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer transition-colors shadow-sm"
             >
               <option value="All">Experience: All</option>
               <option value="Fresher">Fresher</option>
@@ -186,7 +187,7 @@ export const JobListings: React.FC<JobListingsProps> = ({
             <select
               value={selectedQual}
               onChange={(e) => setSelectedQual(e.target.value)}
-              className="text-xs h-9 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 font-medium focus:outline-none"
+              className="text-xs h-9 pl-3 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer transition-colors shadow-sm"
             >
               <option value="All">Education: All</option>
               <option value="10th Pass">10th Pass</option>

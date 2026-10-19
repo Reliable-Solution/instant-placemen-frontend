@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Send, Sparkles, ExternalLink } from "lucide-react";
+import { CheckCircle2, Send, Sparkles, ExternalLink, Loader2 } from "lucide-react";
 import { useGetSettingsQuery } from "@/services/api/settingsApi";
 import { useCreateLeadMutation } from "@/services/api/leadApi";
+import { toast } from "@/components/ui/toast";
 
 export const AppDownloadBanner: React.FC = () => {
   const { data: settings } = useGetSettingsQuery();
-  const [createLead] = useCreateLeadMutation();
+  const [createLead, { isLoading: isSubmitting }] = useCreateLeadMutation();
   const [mobileNum, setMobileNum] = useState("");
   const [isSent, setIsSent] = useState(false);
 
@@ -18,16 +19,21 @@ export const AppDownloadBanner: React.FC = () => {
 
   const handleGetLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mobileNum.length >= 10) {
-      try {
-        await createLead({ phone: mobileNum, source: "whatsapp_banner" }).unwrap();
-      } catch (err) {
-        // ignore error, still open WhatsApp
-      }
+    const cleanNumber = mobileNum.replace(/\D/g, "").slice(-10);
+    if (cleanNumber.length !== 10) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
+    try {
+      await createLead({ phone: cleanNumber, source: "whatsapp_banner" }).unwrap();
+      toast.success("Job alerts subscribed! Opening WhatsApp...");
       window.open(whatsappLink, "_blank");
       setIsSent(true);
       setMobileNum("");
-      setTimeout(() => setIsSent(false), 3000);
+      setTimeout(() => setIsSent(false), 4000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "Failed to submit phone number. Please try again.");
     }
   };
 
@@ -67,10 +73,15 @@ export const AppDownloadBanner: React.FC = () => {
               <Button
                 type="submit"
                 variant="accent"
-                className="h-12 px-5 rounded-xl font-bold text-sm shrink-0 gap-1.5"
+                disabled={isSubmitting}
+                className="h-12 px-5 rounded-xl font-bold text-sm shrink-0 gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <Send className="w-4 h-4" />
-                <span>Get Free Link</span>
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span>{isSubmitting ? "Sending..." : "Get Free Link"}</span>
               </Button>
             </form>
 
