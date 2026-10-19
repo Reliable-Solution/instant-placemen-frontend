@@ -66,14 +66,14 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
       const savedUserStr = localStorage.getItem("ip_user");
       const savedToken = localStorage.getItem("ip_token");
       if (!savedUserStr || !savedToken) {
-        router.push("/employer/login");
+        router.replace("/employer/login");
         return;
       }
       try {
         const u = JSON.parse(savedUserStr);
         if (u.role !== "EMPLOYER" && u.role !== "ADMIN") {
           // Candidate account trying to access employer portal! Redirect to employer login
-          router.push("/employer/login?role_mismatch=true");
+          router.replace("/employer/login?role_mismatch=true");
           return;
         }
         const tokenOk =
@@ -81,12 +81,12 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           verifyRoleFromToken(savedToken, "ADMIN");
         if (!tokenOk) {
           // Token missing, expired, or role mismatch — force re-login
-          router.push("/employer/login");
+          router.replace("/employer/login");
           return;
         }
         setValidated(true);
       } catch {
-        router.push("/employer/login");
+        router.replace("/employer/login");
       }
     }
   }, [mounted, isLoginPage, router]);
@@ -200,11 +200,13 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                   <span>{displayCompanyName ? displayCompanyName.charAt(0).toUpperCase() : "C"}</span>
                 )}
               </div>
-              <div className="overflow-hidden">
-                <p className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
-                  <span>{displayCompanyName || "Your Company"}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-xs font-bold text-slate-900 truncate">
+                    {displayCompanyName || "Your Company"}
+                  </span>
                   <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                </p>
+                </div>
                 <p className="text-xs text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
               </div>
             </div>
@@ -286,11 +288,13 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
                 <span>{displayCompanyName ? displayCompanyName.charAt(0).toUpperCase() : "C"}</span>
               )}
             </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
-                <span>{displayCompanyName || "Your Company"}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="text-xs font-bold text-slate-900 truncate">
+                  {displayCompanyName || "Your Company"}
+                </span>
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              </p>
+              </div>
               <p className="text-xs text-slate-500 truncate">{displayName || "Hiring Manager"}</p>
             </div>
           </div>

@@ -297,27 +297,27 @@ export default function CandidatePrivacyPage() {
             : "bg-amber-50/70 border-amber-300 shadow-amber-500/10"
         }`}
       >
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-start gap-4">
           {/* Status Icon */}
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 ${
+            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 ${
               consent
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30"
                 : "bg-amber-500 text-white shadow-lg shadow-amber-500/30"
             }`}
           >
             {consent ? (
-              <Eye className="w-7 h-7" />
+              <Eye className="w-6 h-6 sm:w-7 sm:h-7" />
             ) : (
-              <EyeOff className="w-7 h-7" />
+              <EyeOff className="w-6 h-6 sm:w-7 sm:h-7" />
             )}
           </div>
 
           {/* Text Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span
-                className={`w-3 h-3 rounded-full ${
+                className={`w-3 h-3 rounded-full shrink-0 ${
                   consent
                     ? "bg-emerald-500 animate-pulse"
                     : "bg-amber-500"
@@ -345,8 +345,8 @@ export default function CandidatePrivacyPage() {
 
             {/* Consent date display */}
             {consent && consentDate && (
-              <div className="mt-3 flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span className="text-xs text-emerald-700 font-semibold">
                   Consent granted on {formatDate(consentDate)}
                 </span>
@@ -356,13 +356,13 @@ export default function CandidatePrivacyPage() {
         </div>
 
         {/* Toggle Switch Row */}
-        <div className="mt-6 pt-5 border-t border-black/10 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="mt-6 pt-5 border-t border-black/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {/* Custom Toggle Switch */}
             <button
               onClick={handleToggleConsent}
               disabled={isToggling}
-              className={`relative w-16 h-8 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 ${
+              className={`relative w-16 h-8 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 shrink-0 ${
                 consent
                   ? "bg-emerald-600 focus:ring-emerald-300"
                   : "bg-slate-300 focus:ring-slate-200"
@@ -462,14 +462,16 @@ export default function CandidatePrivacyPage() {
         <div className="p-5 space-y-6">
           {/* Shared Items */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                <Eye className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide leading-tight text-wrap">
+                  Shared with Verified Employers
+                </h4>
               </div>
-              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide">
-                Shared with Verified Employers
-              </h4>
-              <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200 shrink-0 whitespace-nowrap">
                 {SHARED_ITEMS.length} fields
               </span>
             </div>
@@ -497,14 +499,16 @@ export default function CandidatePrivacyPage() {
 
           {/* Protected Items */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-                <Lock className="w-3.5 h-3.5 text-slate-500" />
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                </div>
+                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide leading-tight text-wrap">
+                  Protected — Never Shared
+                </h4>
               </div>
-              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide">
-                Protected — Never Shared
-              </h4>
-              <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border border-slate-200">
+              <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border border-slate-200 shrink-0 whitespace-nowrap">
                 {PROTECTED_ITEMS.length} fields
               </span>
             </div>
@@ -540,9 +544,9 @@ export default function CandidatePrivacyPage() {
           </div>
           <div className="flex-1 space-y-3">
             <div>
-              <h3 className="font-extrabold text-base text-white flex items-center gap-2">
-                DPDP Act 2023 Compliance
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs px-2 py-0.5 rounded-full font-bold">
+              <h3 className="font-extrabold text-base text-white flex items-center gap-2 flex-wrap">
+                <span>DPDP Act 2023 Compliance</span>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs px-2 py-0.5 rounded-full font-bold shrink-0 whitespace-nowrap">
                   ✓ COMPLIANT
                 </span>
               </h3>
