@@ -117,7 +117,7 @@ export default function EmployerPlansPage() {
           <p className="text-xs text-slate-500 mt-1">Please reach out to support for enterprise mandates.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
           {plans.map((plan: any, idx: number) => {
             const planId = plan.id || plan._id || `plan-${idx}`;
             const isPopular = plan.isPopular || String(planId).includes("2");
@@ -132,7 +132,7 @@ export default function EmployerPlansPage() {
             return (
               <div
                 key={planId}
-                className={`bg-white rounded-2xl border-2 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all relative ${
+                className={`bg-white rounded-2xl border-2 p-5 sm:p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all relative min-w-0 ${
                   isPlanActive
                     ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-md"
                     : isPopular
@@ -144,21 +144,21 @@ export default function EmployerPlansPage() {
               >
                 {/* Active Plan Banner or Popular Tag */}
                 {isPlanActive ? (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Active Plan</span>
                   </div>
                 ) : isPopular ? (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm whitespace-nowrap shrink-0">
                     <Sparkles className="w-3 h-3 fill-current text-amber-300" />
                     <span>Most Popular</span>
                   </div>
                 ) : null}
 
-                <div>
+                <div className="min-w-0">
                   {/* Badge & Icon */}
                   <div className="flex items-center justify-between mb-3 mt-1">
-                    <Badge className={`text-xs font-bold ${
+                    <Badge className={`text-xs font-bold shrink-0 whitespace-nowrap ${
                       isPlanActive
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : isGuarantee
@@ -167,7 +167,7 @@ export default function EmployerPlansPage() {
                     }`}>
                       {isGuarantee ? "Module 3" : isPopular ? "Module 2" : "Module 1"}
                     </Badge>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                       isPlanActive
                         ? "bg-emerald-600 text-white"
                         : isPopular
@@ -180,24 +180,34 @@ export default function EmployerPlansPage() {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900">{plan.title.replace(/^Module \d+:\s*/, "")}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{plan.subtitle}</p>
+                  <h3 className="text-lg font-bold text-slate-900 break-words leading-snug">{plan.title.replace(/^Module \d+:\s*/, "")}</h3>
+                  <p className="text-xs text-slate-500 mt-1 break-words leading-relaxed">{plan.subtitle}</p>
 
                   {/* Price */}
-                  <div className="my-4 pb-3 border-b border-slate-100">
-                    <span className="text-2xl font-extrabold text-slate-900">{plan.priceDisplay}</span>
-                    <span className="text-xs text-slate-500 ml-1">
-                      {plan.billingType === "monthly" ? "/ month"
-                        : plan.billingType === "per_successful_hire" ? "/ hire"
-                        : "(post-joining billing)"}
-                    </span>
+                  <div className="my-4 pb-3 border-b border-slate-100 min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
+                      <span
+                        className={`font-black tracking-tight text-slate-900 break-words leading-tight ${
+                          plan.priceDisplay && plan.priceDisplay.length > 10
+                            ? "text-xl sm:text-2xl"
+                            : "text-2xl sm:text-3xl"
+                        }`}
+                      >
+                        {plan.priceDisplay}
+                      </span>
+                      <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">
+                        {plan.billingType === "monthly" ? "/ month"
+                          : plan.billingType === "per_successful_hire" ? "/ hire"
+                          : "(post-joining billing)"}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Expiration date if active */}
                   {isPlanActive && matchingActivePlan?.expiresAt && (
-                    <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                    <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 min-w-0">
                       <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>
+                      <span className="truncate">
                         Expires on{" "}
                         {new Date(matchingActivePlan.expiresAt).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -210,20 +220,20 @@ export default function EmployerPlansPage() {
 
                   {/* Replacement Guarantee */}
                   {isGuarantee && (
-                    <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{plan.replacementPolicy || "Zero upfront fee. Billed post-joining."}</span>
+                    <div className="mb-4 bg-emerald-50/80 border border-emerald-200 text-emerald-900 px-3 py-2 rounded-xl text-xs font-semibold flex items-start gap-2 min-w-0">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span className="break-words leading-snug">{plan.replacementPolicy || "Zero upfront fee. Billed post-joining."}</span>
                     </div>
                   )}
 
                   {/* Features */}
                   <div className="space-y-2 mb-6">
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Included Scope:</div>
-                    <ul className="space-y-1.5 text-xs text-slate-700">
+                    <ul className="space-y-2 text-xs text-slate-700">
                       {(plan.features || []).map((feat: string, i: number) => (
-                        <li key={i} className="flex items-start gap-2">
+                        <li key={i} className="flex items-start gap-2 min-w-0">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                          <span className={feat.toLowerCase().includes("dedicated") ? "font-semibold" : ""}>{feat}</span>
+                          <span className={`break-words leading-snug ${feat.toLowerCase().includes("dedicated") ? "font-semibold" : ""}`}>{feat}</span>
                         </li>
                       ))}
                     </ul>
@@ -231,44 +241,44 @@ export default function EmployerPlansPage() {
                 </div>
 
                 {/* CTA / Action Button */}
-                <div className="space-y-2">
+                <div className="space-y-2 min-w-0">
                   {isPlanActive ? (
-                    <div className="w-full py-2.5 px-3 bg-emerald-50 border border-emerald-300 text-emerald-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center">
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span>Plan Active & Candidate Contacts Unlocked</span>
+                    <div className="w-full py-2.5 px-3 bg-emerald-50 border border-emerald-300 text-emerald-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center min-w-0">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="truncate">Plan Active & Candidate Contacts Unlocked</span>
                     </div>
                   ) : !plan.price || String(planId).includes("module_3") ? (
                     <a
                       href="mailto:support@instantplacement.in?subject=Module%203%20Enterprise%20Mandate%20Inquiry"
-                      className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs bg-slate-900 text-white hover:bg-slate-800"
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold transition-all shadow-xs bg-slate-900 text-white hover:bg-slate-800 min-w-0"
                     >
-                      <PhoneCall className="w-3.5 h-3.5" />
-                      <span>Contact Sales to Activate</span>
+                      <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">Contact Sales to Activate</span>
                     </a>
                   ) : (
                     <button
                       type="button"
                       disabled={payingPlanId === planId}
                       onClick={() => handleBuyPlan(plan)}
-                      className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs disabled:opacity-60 cursor-pointer ${
+                      className={`w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold transition-all shadow-xs disabled:opacity-60 cursor-pointer min-w-0 ${
                         isPopular
                           ? "bg-blue-600 text-white hover:bg-blue-700"
                           : "bg-slate-900 text-white hover:bg-slate-800"
                       }`}
                     >
-                      <span>{payingPlanId === planId ? "Opening Checkout…" : `Buy Plan — ${plan.priceDisplay}`}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span className="truncate">{payingPlanId === planId ? "Opening Checkout…" : `Buy Plan — ${plan.priceDisplay}`}</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                     </button>
                   )}
                   {payError && payingPlanId === null && (
-                    <p className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+                    <p className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 break-words">
                       {payError}
                     </p>
                   )}
 
                   <a
                     href="/employer/jobs/new"
-                    className="block text-center text-xs text-slate-500 hover:text-slate-700 font-semibold py-1"
+                    className="block text-center text-xs text-slate-500 hover:text-slate-700 font-semibold py-1 truncate"
                   >
                     Post Free Job First →
                   </a>

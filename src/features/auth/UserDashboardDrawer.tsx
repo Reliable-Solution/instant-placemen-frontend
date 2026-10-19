@@ -216,7 +216,7 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
                 <select
                   value={editCity}
                   onChange={(e) => setEditCity(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-lg border border-slate-300 text-xs bg-white"
+                  className="w-full h-9 pl-2.5 pr-7 rounded-lg border border-slate-300 text-xs bg-white truncate"
                 >
                   <option value="Surat">Surat</option>
                   <option value="Mumbai">Mumbai</option>
@@ -233,7 +233,7 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
                 <select
                   value={editExp}
                   onChange={(e) => setEditExp(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-lg border border-slate-300 text-xs bg-white"
+                  className="w-full h-9 pl-2.5 pr-7 rounded-lg border border-slate-300 text-xs bg-white truncate"
                 >
                   <option value="Fresher">Fresher (0 exp)</option>
                   <option value="0-1 Years">0-1 Years</option>
@@ -246,7 +246,7 @@ export const UserDashboardDrawer: React.FC<UserDashboardDrawerProps> = ({
                 <select
                   value={editQual}
                   onChange={(e) => setEditQual(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-lg border border-slate-300 text-xs bg-white"
+                  className="w-full h-9 pl-2.5 pr-7 rounded-lg border border-slate-300 text-xs bg-white truncate"
                 >
                   <option value="10th Pass">10th Pass</option>
                   <option value="12th Pass">12th Pass</option>
