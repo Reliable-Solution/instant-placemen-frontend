@@ -25,6 +25,7 @@ import {
   Eye,
   Plus,
   X,
+  ChevronDown,
 } from "lucide-react";
 
 interface CandidateOnboardingModalProps {
@@ -540,12 +541,12 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                     <select
                       value={noticePeriod}
                       onChange={(e) => setNoticePeriod(e.target.value)}
-                      className="w-full h-10 px-3 bg-white border border-slate-200 text-xs font-medium text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full h-10 pl-3 pr-8 bg-white border border-slate-200 text-xs font-medium text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors truncate"
                     >
                       <option value="IMMEDIATE">⚡ Immediate Joining</option>
                       <option value="15_DAYS">15 Days Notice</option>
                       <option value="30_DAYS">30 Days Notice</option>
-                      <option value="SERVING_NOTICE">Serving Notice Currently</option>
+                      <option value="SERVING_NOTICE">Serving Notice Period</option>
                     </select>
                   </div>
                 </div>
@@ -693,12 +694,12 @@ export const CandidateOnboardingModal: React.FC<CandidateOnboardingModalProps> =
                     <select
                       value={noticePeriod}
                       onChange={(e) => setNoticePeriod(e.target.value)}
-                      className="w-full h-10 px-3 bg-white border border-slate-200 text-xs font-medium text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full h-10 pl-3 pr-8 bg-white border border-slate-200 text-xs font-medium text-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors truncate"
                     >
                       <option value="IMMEDIATE">⚡ Immediate Joining</option>
                       <option value="15_DAYS">15 Days Notice</option>
                       <option value="30_DAYS">30 Days Notice</option>
-                      <option value="SERVING_NOTICE">Serving Notice Currently</option>
+                      <option value="SERVING_NOTICE">Serving Notice Period</option>
                     </select>
                   </div>
                 </div>

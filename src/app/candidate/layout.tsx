@@ -42,24 +42,24 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
       const savedUserStr = localStorage.getItem("ip_user");
       const savedToken = localStorage.getItem("ip_token");
       if (!savedUserStr || !savedToken) {
-        router.push("/candidate/login");
+        router.replace("/candidate/login");
         return;
       }
       try {
         const u = JSON.parse(savedUserStr);
         if (u.role !== "CANDIDATE") {
           // Session belongs to ADMIN or EMPLOYER! Prevent leaking into candidate portal
-          router.push("/candidate/login?role_mismatch=true");
+          router.replace("/candidate/login?role_mismatch=true");
           return;
         }
         if (!verifyRoleFromToken(savedToken, "CANDIDATE")) {
           // Token missing, expired, or role mismatch — force re-login
-          router.push("/candidate/login");
+          router.replace("/candidate/login");
           return;
         }
         setValidated(true);
       } catch {
-        router.push("/candidate/login");
+        router.replace("/candidate/login");
       }
     }
   }, [mounted, isLoginPage, router]);
@@ -161,14 +161,20 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
 
             {/* User info */}
             <div className="p-3 mx-3 my-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-xs font-black text-white shadow-xs shrink-0">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-xs font-black text-white shadow-xs shrink-0 overflow-hidden">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user?.name || "Candidate"} className="w-full h-full object-cover" />
+                ) : (
+                  user?.name ? user.name.charAt(0).toUpperCase() : "C"
+                )}
               </div>
-              <div className="overflow-hidden">
-                <p className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
-                  <span>{user?.name || "Job Seeker"}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-xs font-bold text-slate-900 truncate">
+                    {user?.name || "Job Seeker"}
+                  </span>
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                </p>
+                </div>
                 <p className="text-xs text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
               </div>
             </div>
@@ -239,14 +245,20 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
 
           {/* User Card */}
           <div className="p-3.5 mx-3 my-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-3 shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-xs font-black text-white shadow-xs shrink-0">
-              {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-xs font-black text-white shadow-xs shrink-0 overflow-hidden">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={user?.name || "Candidate"} className="w-full h-full object-cover" />
+              ) : (
+                user?.name ? user.name.charAt(0).toUpperCase() : "C"
+              )}
             </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
-                <span>{user?.name || "Job Seeker"}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="text-xs font-bold text-slate-900 truncate">
+                  {user?.name || "Job Seeker"}
+                </span>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              </p>
+              </div>
               <p className="text-xs text-slate-500 truncate">{user?.phone || "Phone not set"}</p>
             </div>
           </div>
