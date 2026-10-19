@@ -107,6 +107,8 @@ function EmployerLoginContent() {
         throw new Error(msg);
       }
 
+      localStorage.setItem("ip_token", token);
+      localStorage.setItem("ip_user", JSON.stringify({ ...userData, token }));
       dispatch(setUser({ ...userData, token }));
       toast.success(`Welcome back, ${userData.name || "Employer"}! Login successful.`);
       router.push(redirect);
@@ -220,15 +222,17 @@ function EmployerLoginContent() {
           )}
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">Work Email</label>
+            <label className="text-xs font-bold text-slate-700">
+              {mode === "login" ? "Work Email or Mobile Number" : "Work Email"}
+            </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <Input
-                type="email"
+                type={mode === "login" ? "text" : "email"}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="hr@company.com"
+                placeholder={mode === "login" ? "hr@company.com or 10-digit mobile" : "hr@company.com"}
                 className="pl-10 h-10 bg-white border-slate-200 text-slate-900 text-xs rounded-xl"
               />
             </div>
