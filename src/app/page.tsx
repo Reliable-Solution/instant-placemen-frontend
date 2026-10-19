@@ -93,7 +93,11 @@ export default function HomePage() {
   // RTK Query: Server Cache & Data Fetching
   const { data: categories = [] } = useGetCategoriesQuery();
   const { data: cities = [] } = useGetCitiesQuery();
-  const { data: jobs = [] } = useGetJobsQuery({
+  const {
+    data: jobs = [],
+    isLoading: isJobsLoading,
+    isFetching: isJobsFetching,
+  } = useGetJobsQuery({
     city: selectedCity,
     category: selectedCategory,
     query: searchQuery.trim().slice(0, 100),
@@ -145,6 +149,7 @@ export default function HomePage() {
           const el = document.getElementById("jobs-section");
           if (el) el.scrollIntoView({ behavior: "smooth" });
         }}
+        isLoadingJobs={isJobsLoading || isJobsFetching}
       />
 
       {/* 3. Trust & Key Stats */}

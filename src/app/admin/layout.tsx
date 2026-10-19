@@ -62,13 +62,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const savedUserStr = localStorage.getItem("ip_user");
       const savedToken = localStorage.getItem("ip_token");
       if (!savedUserStr || !savedToken) {
-        router.push("/admin/login");
+        router.replace("/admin/login");
         return;
       }
       try {
         const u = JSON.parse(savedUserStr);
         if (u.role !== "ADMIN" && u.role !== "RECRUITER") {
-          router.push("/admin/login");
+          router.replace("/admin/login");
           return;
         }
         const tokenOk =
@@ -76,12 +76,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           verifyRoleFromToken(savedToken, "RECRUITER");
         if (!tokenOk) {
           // Token missing, expired, or role mismatch — force re-login
-          router.push("/admin/login");
+          router.replace("/admin/login");
           return;
         }
         setValidated(true);
       } catch {
-        router.push("/admin/login");
+        router.replace("/admin/login");
       }
     }
   }, [mounted, isLoginPage, router]);
