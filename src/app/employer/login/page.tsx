@@ -110,10 +110,18 @@ function EmployerLoginContent() {
       localStorage.setItem("ip_token", token);
       localStorage.setItem("ip_user", JSON.stringify({ ...userData, token }));
       dispatch(setUser({ ...userData, token }));
-      toast.success(`Welcome back, ${userData.name || "Employer"}! Login successful.`);
+      
+      if (mode === "register") {
+        toast.success(data.message || `Company registered successfully! Welcome, ${userData.name || companyName || "Employer"}.`);
+      } else {
+        toast.success(data.message || `Welcome back, ${userData.name || "Employer"}! Login successful.`);
+      }
+
       router.push(redirect);
     } catch (err: any) {
-      setError(err.message || "Failed to process request.");
+      const msg = err.message || "Failed to process request.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -187,13 +195,13 @@ function EmployerLoginContent() {
                     required
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="e.g. Reliance Retail / Tech Corp"
+                    placeholder="e.g. Reliance Retail"
                     className="pl-10 h-10 bg-white border-slate-200 text-slate-900 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Contact Person</label>
                   <Input
@@ -213,7 +221,7 @@ function EmployerLoginContent() {
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="9876543210"
+                    placeholder="10-digit mobile"
                     className="h-10 bg-white border-slate-200 text-slate-900 text-xs rounded-xl"
                   />
                 </div>
