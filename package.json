@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node api.js && next dev -p 4332",
-    "build": "node api.js && next build",
-    "start": "node api.js && next start -p 4332",
+    "dev": "next dev -p 4332",
+    "build": "next build",
+    "start": "next start -p 4332",
     "lint": "next lint"
   },
   "dependencies": {
@@ -17,11 +17,9 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
     "@reduxjs/toolkit": "^2.12.0",
-    "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "emoji-picker-react": "^4.22.3",
-    "instant-placement-monorepo": "file:..",
     "lucide-react": "^0.453.0",
     "next": "^16.3.5",
     "pdfjs-dist": "^4.10.38",
