@@ -17,6 +17,9 @@ export const getApiBaseUrl = (): string => {
     if (hostname.endsWith(".trycloudflare.com") || hostname.includes("ngrok")) {
       return "/api/v1";
     }
+    if (hostname.includes("staging")) {
+      return "https://staging-api.instantplacement.in/api/v1";
+    }
     if (hostname === "instantplacement.in" || hostname.endsWith(".instantplacement.in")) {
       return "https://api.instantplacement.in/api/v1";
     }
