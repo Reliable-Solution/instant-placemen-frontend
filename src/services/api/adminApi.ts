@@ -145,7 +145,7 @@ export const adminApi = baseApi.injectEndpoints({
     getAiParserConfig: builder.query<{ success: boolean; config?: any }, void>({
       query: () => "/admin/aiparser/config",
       providesTags: ["Admin"],
-    }),    updateAiParserConfig: builder.mutation<{ success: boolean; message?: string }, any>({
+    }), updateAiParserConfig: builder.mutation<{ success: boolean; message?: string }, any>({
       query: (body) => ({
         url: "/admin/aiparser/config",
         method: "POST",
@@ -282,7 +282,19 @@ export const adminApi = baseApi.injectEndpoints({
         body: { jobId },
       }),
     }),
-    getAdminSubscriptions: builder.query<{ success: boolean; subscriptions: any[]; pending: any[]; failed: any[] }, { status?: string } | void>({      query: (params) => {
+    updateCandidateSkills: builder.mutation<
+      { success: boolean; user?: any; message?: string },
+      { id: string; skills: string[] }
+    >({
+      query: ({ id, skills }) => ({
+        url: `/admin/users/${id}`,
+        method: "PUT",
+        body: { skills },
+      }),
+      invalidatesTags: ["Admin", "Candidate"],
+    }),
+    getAdminSubscriptions: builder.query<{ success: boolean; subscriptions: any[]; pending: any[]; failed: any[] }, { status?: string } | void>({
+      query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.status) queryParams.set("status", params.status);
         return `/admin/subscriptions?${queryParams.toString()}`;
@@ -318,6 +330,7 @@ export const {
   useDeletePlanMutation,
   useToggleArchivePlanMutation,
   useSendCandidateJobAlertMutation,
+  useUpdateCandidateSkillsMutation,
   useGetAdminSubscriptionsQuery,
   useGetAiParserConfigQuery,
   useUpdateAiParserConfigMutation,
