@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/components/ClientProviders";
+import { PwaManager } from "@/components/PwaManager";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,15 +41,22 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/icons/icon-192x192.png" },
       { url: "/icon.png" },
       { url: "/favicon.ico" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/icon.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Instant Placement",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
+  themeColor: "#2563eb",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -83,7 +91,10 @@ export default function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
           Skip to main content
         </a>
-        <ClientProviders>{children}</ClientProviders>
+        <ClientProviders>
+          {children}
+          <PwaManager />
+        </ClientProviders>
       </body>
     </html>
   );
