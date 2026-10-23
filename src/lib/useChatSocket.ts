@@ -6,6 +6,12 @@ import { getApiBaseUrl } from "@/lib/config";
 
 const getSocketBaseUrl = () => {
   const api = getApiBaseUrl();
+  // Relative API base (tunnel hostnames like *.trycloudflare.com return "/api/v1")
+  // → connect to the same origin; next.config.js rewrites proxy /socket.io to the
+  // backend, so chat works for any visitor of the tunnel, not just localhost.
+  if (api.startsWith("/")) {
+    return typeof window !== "undefined" ? window.location.origin : "http://localhost:5100";
+  }
   try {
     const u = new URL(api);
     return `${u.protocol}//${u.host}`;
@@ -29,7 +35,9 @@ export function useChatSocket(activeConversationId?: string) {
     const socket = io(getSocketBaseUrl(), {
       path: "/socket.io",
       auth: { token },
-      transports: ["websocket", "polling"],
+      // polling first: survives proxies that can't upgrade websockets
+      // (engine.io falls back to long-polling; tries websocket upgrade after)
+      transports: ["polling", "websocket"],
     });
     socketRef.current = socket;
     socket.on("connect", () => setConnected(true));

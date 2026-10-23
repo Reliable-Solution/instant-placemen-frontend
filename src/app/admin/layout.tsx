@@ -29,6 +29,7 @@ import {
   UserPlus,
   Receipt,
   PhoneCall,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -142,6 +143,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         },
         { label: "ATS Applications", href: "/admin/applications", icon: FileText },
         { label: "Operations Pipeline", href: "/admin/pipeline", icon: GitBranch },
+        {
+          label: "Daily Reports",
+          href: "/admin/reports",
+          icon: FileSpreadsheet,
+          badge: "DSR",
+        },
       ],
     },
     {
@@ -190,8 +197,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           item.href === "/admin"
             ? pathname === "/admin"
             : hasSubItems
-            ? pathname === item.href || pathname.startsWith(item.href)
-            : pathname === item.href;
+              ? pathname === item.href || pathname.startsWith(item.href)
+              : pathname === item.href;
         const isOpen = !!openSubMenus[item.href];
 
         return (
@@ -200,11 +207,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 type="button"
                 onClick={() => toggleSubMenu(item.href)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  isParentActive
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isParentActive
                     ? "bg-blue-600 text-white font-bold shadow-sm shadow-blue-600/20"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon className={`w-4 h-4 ${isParentActive ? "text-white" : "text-slate-500"}`} />
@@ -220,11 +226,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 href={item.href}
                 onClick={isMobile ? () => setSidebarOpen(false) : undefined}
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  isParentActive
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${isParentActive
                     ? "bg-blue-600 text-white font-bold shadow-sm shadow-blue-600/20"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Icon className={`w-4 h-4 shrink-0 ${isParentActive ? "text-white" : "text-slate-500"}`} />
@@ -270,9 +275,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold">
-        Skip to main content
-      </a>
       {/* Mobile Topbar: Sticky at the top */}
       <header className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs sticky top-0 z-20">
         <Link href="/" className="flex items-center gap-2">

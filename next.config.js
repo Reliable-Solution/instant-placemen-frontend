@@ -17,10 +17,8 @@ const nextConfig = {
   async rewrites() {
     const backendBase =
       process.env.BACKEND_INTERNAL_URL ||
-      (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost") && !process.env.NEXT_PUBLIC_API_URL.startsWith("/")
-        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
-        : process.env.NODE_ENV === "production"
-        ? "https://api.instantplacement.in"
+      (process.env.NEXT_PUBLIC_API_URL
+        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
         : "http://127.0.0.1:5100");
 
     return [
@@ -31,6 +29,48 @@ const nextConfig = {
       {
         source: "/uploads/:path*",
         destination: `${backendBase}/uploads/:path*`,
+      },
+      // socket.io (chat) — same-origin so it works through Cloudflare tunnels.
+      // NOTE: engine.io only answers on "/socket.io/" (with trailing slash), and
+      // Next 308-redirects "/socket.io/" → "/socket.io", so the destination MUST
+      // re-add the slash or the backend returns 404.
+      {
+        source: "/socket.io",
+        destination: `${backendBase}/socket.io/`,
+      },
+      {
+        source: "/socket.io/:path*",
+        destination: `${backendBase}/socket.io/:path*`,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Content-Type",
+            value: "application/javascript",
+          },
+          {
+            key: "Service-Worker-Allowed",
+            value: "/",
+          },
+        ],
+      },
+      {
+        source: "/manifest.webmanifest",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, must-revalidate",
+          },
+        ],
       },
     ];
   },

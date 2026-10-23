@@ -106,6 +106,16 @@ export const authSlice = createSlice({
       try {
         localStorage.removeItem("ip_user");
         localStorage.removeItem("ip_token");
+        // Clear runtime caches on logout so no private/auth data stays on shared devices
+        if (typeof window !== "undefined" && "caches" in window) {
+          caches.keys().then((keys) => {
+            keys.forEach((key) => {
+              if (key !== "ip-static-v1") {
+                caches.delete(key);
+              }
+            });
+          });
+        }
       } catch (e) {
         console.error(e);
       }
