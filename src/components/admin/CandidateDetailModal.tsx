@@ -27,29 +27,91 @@ import {
   Send,
   ChevronDown,
   Loader2,
+  Plus,
+  Check,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useGetAdminJobsQuery, useSendCandidateJobAlertMutation } from "@/services/api/adminApi";
+import { useGetAdminJobsQuery, useSendCandidateJobAlertMutation, useUpdateCandidateSkillsMutation } from "@/services/api/adminApi";
 
 interface CandidateDetailModalProps {
   candidate: any;
   isOpen: boolean;
   onClose: () => void;
+  onUpdateCandidate?: (updatedCandidate: any) => void;
 }
 
 export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
   candidate,
   isOpen,
   onClose,
+  onUpdateCandidate,
 }) => {
   const [activeTab, setActiveTab] = useState<"profile" | "cv">("profile");
   const [showJobPicker, setShowJobPicker] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState("");
   const [alertStatus, setAlertStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
+  // Skill management state
+  const [localSkills, setLocalSkills] = useState<string[]>(candidate?.skills || []);
+  const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [newSkillInput, setNewSkillInput] = useState("");
+  const [skillSaveError, setSkillSaveError] = useState<string | null>(null);
+  const [skillSaveSuccess, setSkillSaveSuccess] = useState(false);
+
+  // Sync skills when candidate prop changes
+  React.useEffect(() => {
+    setLocalSkills(candidate?.skills || []);
+    setIsAddingSkill(false);
+    setNewSkillInput("");
+    setSkillSaveError(null);
+  }, [candidate]);
+
   // Fetch active jobs for the picker
   const { data: adminJobs = [] } = useGetAdminJobsQuery({ status: "ACTIVE", limit: 100 });
   const [sendJobAlert, { isLoading: isSending }] = useSendCandidateJobAlertMutation();
+  const [updateCandidateSkills, { isLoading: isUpdatingSkills }] = useUpdateCandidateSkillsMutation();
+
+  const handleAddSkill = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newSkillInput.trim();
+    if (!trimmed) return;
+
+    if (localSkills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
+      setSkillSaveError(`"${trimmed}" already exists.`);
+      return;
+    }
+
+    const updatedSkills = [...localSkills, trimmed];
+    setLocalSkills(updatedSkills);
+    setNewSkillInput("");
+    setSkillSaveError(null);
+
+    try {
+      const candidateId = candidate._id || candidate.id;
+      await updateCandidateSkills({ id: candidateId, skills: updatedSkills }).unwrap();
+      setSkillSaveSuccess(true);
+      setTimeout(() => setSkillSaveSuccess(false), 2500);
+      onUpdateCandidate?.({ ...candidate, skills: updatedSkills });
+    } catch (err: any) {
+      setLocalSkills(candidate?.skills || []);
+      setSkillSaveError(err?.data?.message || err?.message || "Failed to add skill");
+    }
+  };
+
+  const handleRemoveSkill = async (skillToRemove: string) => {
+    const updatedSkills = localSkills.filter((s) => s !== skillToRemove);
+    setLocalSkills(updatedSkills);
+    setSkillSaveError(null);
+
+    try {
+      const candidateId = candidate._id || candidate.id;
+      await updateCandidateSkills({ id: candidateId, skills: updatedSkills }).unwrap();
+      onUpdateCandidate?.({ ...candidate, skills: updatedSkills });
+    } catch (err: any) {
+      setLocalSkills(candidate?.skills || []);
+      setSkillSaveError(err?.data?.message || err?.message || "Failed to remove skill");
+    }
+  };
 
   if (!isOpen || !candidate) return null;
 
@@ -460,28 +522,104 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                 </div>
               )}
 
-              {/* Skills Badges */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
+              {/* Skills Badges with Add Skill (+) Button */}
+              <div className="space-y-3 bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                    <span>Skills &amp; Competencies ({candidate.skills?.length || 0})</span>
+                    <span>Skills &amp; Competencies ({localSkills.length})</span>
                   </h3>
+
+                  {!isAddingSkill && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingSkill(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Skill</span>
+                    </button>
+                  )}
                 </div>
 
-                {candidate.skills && candidate.skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {candidate.skills.map((s: string, idx: number) => (
+                {/* Inline Add Skill Input Form */}
+                {isAddingSkill && (
+                  <form onSubmit={handleAddSkill} className="flex items-center gap-2 pt-1 animate-in fade-in duration-150">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={newSkillInput}
+                      onChange={(e) => setNewSkillInput(e.target.value)}
+                      placeholder="Type skill name (e.g. JavaScript, Python, React, Tally) and press Enter..."
+                      className="flex-1 h-9 px-3 text-xs bg-white border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl font-medium text-slate-900 placeholder:text-slate-400 shadow-xs"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isUpdatingSkills || !newSkillInput.trim()}
+                      className="h-9 px-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-colors inline-flex items-center gap-1 shrink-0 shadow-xs cursor-pointer"
+                    >
+                      {isUpdatingSkills ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5" />
+                      )}
+                      <span>Add</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddingSkill(false);
+                        setNewSkillInput("");
+                        setSkillSaveError(null);
+                      }}
+                      className="h-9 px-3 text-slate-600 hover:text-slate-800 hover:bg-slate-200 text-xs font-semibold rounded-xl transition-colors shrink-0 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                )}
+
+                {skillSaveError && (
+                  <p className="text-xs text-rose-600 font-semibold">{skillSaveError}</p>
+                )}
+                {skillSaveSuccess && (
+                  <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> Skill added successfully!
+                  </p>
+                )}
+
+                {localSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {localSkills.map((s: string, idx: number) => (
                       <span
                         key={idx}
-                        className="px-3 py-1.5 bg-blue-50/90 text-blue-800 border border-blue-200 rounded-xl text-xs font-bold shadow-2xs"
+                        className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-blue-900 border border-blue-200 rounded-xl text-xs font-bold shadow-2xs hover:border-blue-400 transition-all"
                       >
-                        {s}
+                        <span>{s}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(s)}
+                          disabled={isUpdatingSkills}
+                          title={`Remove ${s}`}
+                          className="w-4 h-4 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-0.5 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500">No skills added yet.</p>
+                  <div className="p-4 bg-white border border-dashed border-slate-300 rounded-xl text-center space-y-2">
+                    <p className="text-xs text-slate-500 font-medium">No skills listed for this candidate yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingSkill(true)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Click here to add the first skill</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
